@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write src/**/*.{tsx,jsx,ts,js,vue}"
+    "format": "prettier --write ./**/*.{tsx,jsx,ts,js,vue}"
   },
   "dependencies": {
     "graphql-request": "^6.1.0",
