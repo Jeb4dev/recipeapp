@@ -1,21 +1,39 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+
+This web-based application offers the following features:
+
+- User Management: Users can register, log in, and admi user can monitor other users accounts and recipes.
+- Recipe Management: Registered users can add, edit, and delete their own recipes. Recipes can be marked as private.
+- Recipe Discovery: Users can search for recipes by ingredients or keywords, review recipes, and create a list of favorite recipes.
+- Recipe Reviewing: Registered users can review others recipes.
+- Recipe Sharing: Users can share recipes via email or social media
+
+## Technology
+
+We are using Next.js for the frontend and backend and DatoCMS for Backend. We use best practise code linting and formatting tools like EsLint and Prettier. 
+TailwindCSS is used for styling frontend. 
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+
+## Requirements
+
+- Node 20
+
+## Running in development environment
+
+- Clone the repository `git clone <repo-url>`
+- Change directory to recipe app `cd recipeapp`
+- Install dependacies `npm install`
+- Copy `env.example` `into env.local` with `cp env.example env.local`
+- Change `NEXT_DATOCMS_API_TOKEN` value to the correct one
+- Start dev server `npm run dev`
+
+# Contributing
+
+Before committing your changes, please run `npm run format`. Please do not commit broken code to main.
 
 # Build and Test
-TODO: Describe and show how to build your code and run the tests. 
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+- `npm run build`
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
-testi
+- `npm run test` < not implemented
