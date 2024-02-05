@@ -40,17 +40,21 @@ const HomePage = (props) => {
   return (
     <Layout>
       <div>
-        <h1 className="text-2xl font-bold mb-4">Top Recipes</h1>
+        <h1 className="text-2xl font-bold mb-4">Tykätyimmät reseptit</h1>
         <div className="flex flex-wrap justify-around">
-          {recipes.map((recipe, index) => (
-            <RecipeCard key={index} recipe={recipe} />
-          ))}
-        </div>
-        <h1 className="text-2xl font-bold mb-4">Trending Recipes</h1>
-        <div className="flex flex-wrap justify-around">
-          {recipes.map((recipe, index) => (
+          {recipes
+            .sort((a, b) => b.likes - a.likes)
+            .map((recipe, index) => (
               <RecipeCard key={index} recipe={recipe} />
-          ))}
+            ))}
+        </div>
+        <h1 className="text-2xl font-bold mb-4">Uusimmat reseptit</h1>
+        <div className="flex flex-wrap justify-around">
+          {recipes
+            .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+            .map((recipe, index) => (
+              <RecipeCard key={index} recipe={recipe} />
+            ))}
         </div>
       </div>
     </Layout>
@@ -66,6 +70,7 @@ const ALL_RECIPES_QUERY = `
     title
     likes
     description
+    _createdAt
     image {
       responsiveImage {
         alt
