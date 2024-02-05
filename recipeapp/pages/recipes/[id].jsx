@@ -2,18 +2,23 @@ import Layout from '../../components/layout';
 import { request } from '../../lib/datocms';
 import { Image } from 'react-datocms';
 
-export default function Post(props) {
+export default function RecipePage(props) {
   const recipe = props.data.recipe;
   return (
     <Layout>
       <div>
-        <Image
-          className={'h-[600px]'}
-          data={recipe.image[0].responsiveImage}
-          alt={recipe.image[0].responsiveImage.alt}
-          objectFit={'cover'}
-        />
-        <div className={"px-10"}>
+        <div className="flex">
+          {recipe.image.map((img, index) => (
+            <Image
+              key={index}
+              className={'h-[600px] w-[600px]'}
+              data={img.responsiveImage}
+              alt={img.responsiveImage.alt}
+              objectFit={'cover'}
+            />
+          ))}
+        </div>
+        <div className={'px-10'}>
           <div className={'flex justify-between items-center'}>
             <h1 className="text-2xl font-bold my-4">{recipe.title}</h1>
             <p className="text-2xl">{`⭐️ ${recipe.likes}`}</p>
@@ -77,7 +82,6 @@ query MyQuery($id: ItemId) {
 }
 `;
 export const getStaticProps = async ({ params }) => {
-  console.log(params);
   const data = await request({
     query: POST_QUERY,
     variables: {
