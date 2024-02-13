@@ -57,7 +57,7 @@ export default function NewRecipe() {
               name="title"
               value={title}
               onChange={handleTitleChange}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border rounded-md text-black"
               required
               placeholder='Write recipe name here.'
             />
@@ -70,7 +70,7 @@ export default function NewRecipe() {
               value={description}
               onChange={handleDescriptionChange}
               rows="4"
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border rounded-md text-black"
               required
               placeholder='Write description of your recipe here.'
             ></textarea>
@@ -83,7 +83,7 @@ export default function NewRecipe() {
               name="ingredients"
               value={ingredientInput}
               onChange={handleIngredientChange}
-              className="w-full px-4 py-2 border rounded-md"
+              className="w-full px-4 py-2 border rounded-md text-black"
               placeholder='Type your ingredient, then click "Add Ingredient" button to add it to the list of ingredients.'
             />
           </div>
