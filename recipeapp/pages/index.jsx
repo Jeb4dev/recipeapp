@@ -1,5 +1,5 @@
 // pages/index.js
-import Layout from '../components/Layout';
+import Layout from '../components/layout';
 import RecipeCard from '../components/RecipeCard';
 import { request } from '../lib/datocms';
 
