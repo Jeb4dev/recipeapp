@@ -11,6 +11,11 @@ const Header = () => (
       <nav>
         <ul className="flex space-x-4">
           <li>
+            <Link href={'/newrecipe'}>
+              <p className="text-white hover:text-gray-300">New Recipe</p>
+            </Link>
+          </li>
+          <li>
             <Link href={'/recipes'}>
               <p className="text-white hover:text-gray-300">Recipes</p>
             </Link>
