@@ -26,8 +26,8 @@ const Header = () => (
             </Link>
           </li>
           <li>
-            <Link href={'/account'}>
-              <p className="text-white hover:text-gray-300">Account</p>
+            <Link href={'/login'}>
+              <p className="text-white hover:text-gray-300">Login</p>
             </Link>
           </li>
         </ul>
