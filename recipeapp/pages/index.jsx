@@ -3,38 +3,6 @@ import Layout from '../components/layout';
 import RecipeCard from '../components/RecipeCard';
 import { request } from '../lib/datocms';
 
-const dummyData = [
-  {
-    image: 'https://via.placeholder.com/150',
-    title: 'Recipe 1',
-    description: 'This is a description for Recipe 1.',
-    rating: 4.5,
-  },
-  {
-    image: 'https://via.placeholder.com/150',
-    title: 'Recipe 2',
-    description: 'This is a description for Recipe 2.',
-    rating: 4.0,
-  },
-  {
-    image: 'https://via.placeholder.com/150',
-    title: 'Recipe 3',
-    description: 'This is a description for Recipe 3.',
-    rating: 5.0,
-  },
-  {
-    image: 'https://via.placeholder.com/150',
-    title: 'Recipe 4',
-    description: 'This is a description for Recipe 4.',
-    rating: 3.5,
-  },
-  {
-    image: 'https://via.placeholder.com/150',
-    title: 'Recipe 5',
-    description: 'This is a description for Recipe 5.',
-    rating: 4.5,
-  },
-];
 const HomePage = (props) => {
   const recipes = props.data.allRecipes;
   return (
