@@ -30,7 +30,7 @@ function parseError(error) {
 }
 
 async function register(username, name, email, password) {
-  const client = buildClient({ apiToken: process.env.NEXT_DATOCMS_API_TOKEN });
+  const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create a new user');
   try {
     const record = await client.items.create({
