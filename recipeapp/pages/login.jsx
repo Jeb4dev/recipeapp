@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -93,6 +94,11 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
+          <div className="mt-2 text-center">
+            <Link href="/register">
+              <p className="font-medium text-indigo-600 hover:text-indigo-500">No account yet? Sign up</p>
+            </Link>
+          </div>
         </div>
       </div>
     </Layout>
