@@ -10,6 +10,7 @@
     "format": "prettier --write ./**/*.{tsx,jsx,ts,js,vue}"
   },
   "dependencies": {
+    "@datocms/cma-client-node": "^3.1.2",
     "graphql-request": "^6.1.0",
     "next": "^14.1.0",
     "react": "^18",
