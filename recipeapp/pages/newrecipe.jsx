@@ -50,7 +50,9 @@ export default function NewRecipe() {
         <h1 className="text-3xl font-semibold mb-4">New Recipe</h1>
         <form>
           <div className="mb-4">
-            <label htmlFor="title" className="block mb-2">Recipe Name:</label>
+            <label htmlFor="title" className="block mb-2">
+              Recipe Name:
+            </label>
             <input
               type="text"
               id="title"
@@ -59,11 +61,13 @@ export default function NewRecipe() {
               onChange={handleTitleChange}
               className="w-full px-4 py-2 border rounded-md text-black"
               required
-              placeholder='Write recipe name here.'
+              placeholder="Write recipe name here."
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="description" className="block mb-2">Description:</label>
+            <label htmlFor="description" className="block mb-2">
+              Description:
+            </label>
             <textarea
               id="description"
               name="description"
@@ -72,11 +76,13 @@ export default function NewRecipe() {
               rows="4"
               className="w-full px-4 py-2 border rounded-md text-black"
               required
-              placeholder='Write description of your recipe here.'
+              placeholder="Write description of your recipe here."
             ></textarea>
           </div>
           <div className="mb-4">
-            <label htmlFor="ingredients" className="block mb-2">Ingredients:</label>
+            <label htmlFor="ingredients" className="block mb-2">
+              Ingredients:
+            </label>
             <input
               type="text"
               id="ingredients"
@@ -87,15 +93,29 @@ export default function NewRecipe() {
               placeholder='Type your ingredient, then click "Add Ingredient" button to add it to the list of ingredients.'
             />
           </div>
-          <button type="button" onClick={handleAddIngredient} className="bg-red-500 text-white px-4 py-2 rounded-md mb-4">Add Ingredient</button>
+          <button
+            type="button"
+            onClick={handleAddIngredient}
+            className="bg-red-500 text-white px-4 py-2 rounded-md mb-4"
+          >
+            Add Ingredient
+          </button>
           {ingredients.length > 0 && (
             <ul className="mb-4">
               {ingredients.map((ingredient, index) => (
                 <li key={index} className="flex items-center">
                   <span className="mr-2">{ingredient}</span>
-                  <button type="button" onClick={() => handleRemoveIngredient(index)} className="text-red-500 hover:text-red-700">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIngredient(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                 </li>
@@ -103,7 +123,9 @@ export default function NewRecipe() {
             </ul>
           )}
           <div className="mb-4">
-            <label htmlFor="images" className="block mb-2">Images:</label>
+            <label htmlFor="images" className="block mb-2">
+              Images:
+            </label>
             <input
               type="file"
               id="images"
@@ -119,9 +141,17 @@ export default function NewRecipe() {
               {images.map((image, index) => (
                 <li key={index} className="flex items-center">
                   <span className="mr-2">{image.name}</span>
-                  <button type="button" onClick={() => handleRemoveImage(index)} className="text-red-500 hover:text-red-700">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clipRule="evenodd" />
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </button>
                 </li>

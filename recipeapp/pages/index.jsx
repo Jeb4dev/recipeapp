@@ -8,7 +8,7 @@ const HomePage = (props) => {
   return (
     <Layout>
       <div>
-        <div className={"max-w-7xl mx-auto"}>
+        <div className={'max-w-7xl mx-auto'}>
           <h1 className="text-2xl font-bold mb-4">Tykätyimmät reseptit</h1>
           <div className="flex flex-wrap justify-between">
             {recipes
@@ -17,7 +17,7 @@ const HomePage = (props) => {
               .slice(0, 3)}
           </div>
         </div>
-        <div className={"max-w-7xl mx-auto"}>
+        <div className={'max-w-7xl mx-auto'}>
           <h1 className="text-2xl font-bold mb-4">Uusimmat reseptit</h1>
           <div className="flex flex-wrap justify-around">
             {recipes
