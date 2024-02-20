@@ -6,7 +6,7 @@ import Link from 'next/link';
 const RecipeCard = ({ recipe }) => {
   const image = recipe.image[0];
   return (
-    <div className="max-w-sm rounded overflow-hidden shadow-lg m-4 bg-amber-500">
+    <div className="max-w-sm rounded overflow-hidden shadow-lg my-4 bg-amber-500">
       <Image className="w-full h-48" alt={image.responsiveImage.alt} data={image.responsiveImage} objectFit={'cover'} />
       <div className="px-6 py-4">
         <Link href={`/recipes/${recipe.id}`}>
