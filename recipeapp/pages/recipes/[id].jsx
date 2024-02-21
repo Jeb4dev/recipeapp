@@ -1,11 +1,24 @@
 import Layout from '../../components/layout';
 import { request } from '../../lib/datocms';
 import { Image } from 'react-datocms';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEnvelope, faHeart, faPrint } from '@fortawesome/free-solid-svg-icons';
 
 export default function RecipePage(props) {
   const recipe = props.data.recipe;
+  const [likes, setLikes] = useState(recipe.likes);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentUrl, setCurrentUrl] = useState('');
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, []);
+
+  const handleLike = () => {
+    setLikes(likes + 1);
+  };
 
   const handleNextImage = () => {
     setCurrentImageIndex((currentImageIndex + 1) % recipe.image.length);
@@ -17,59 +30,87 @@ export default function RecipePage(props) {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
-        <div className="flex items-center">
-          <button
-            onClick={handlePreviousImage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Previous
-          </button>
-          <Image
-            key={recipe.image[currentImageIndex].responsiveImage.src}
-            className={'h-[600px] w-[600px]'}
-            data={recipe.image[currentImageIndex].responsiveImage}
-            alt={recipe.image[currentImageIndex].responsiveImage.alt}
-            objectFit={'cover'}
-          />
-          <button
-            onClick={handleNextImage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Next
-          </button>
-        </div>
-        <p className="mt-4">{recipe.description}</p>
-        <h2 className="text-2xl font-bold mt-4">Ingredients</h2>
-        <ul className="list-disc ml-5">
-          {recipe.incredients.map((ingredient, index) => (
-            <li key={index} className="my-2">
-              {ingredient.amount} {ingredient.unit} {ingredient.name}
-            </li>
-          ))}
-        </ul>
-        <h2 className="text-2xl font-bold mt-4">Instructions</h2>
-        <ol className="list-decimal ml-5">
-          {recipe.instructions.map((instruction, index) => (
-            <li key={index} className="my-2">
-              {instruction.instruction}
-            </li>
-          ))}
-        </ol>
-        <h2 className="text-2xl font-bold mt-4">Author</h2>
-        <div className="flex items-center">
-          {recipe.author?.image && (
-            <>
+      <div className={'bg-red-50 min-h-screen'}>
+        <div className="max-w-screen-xl mx-auto">
+          <div className="flex justify-center items-center w-full">
+            <div className="relative group w-screen">
               <Image
-                data={recipe.author.image.responsiveImage}
-                className={'w-16 h-16 rounded-full mr-4'}
-                alt={recipe.author.image.responsiveImage.alt}
+                key={recipe.image[currentImageIndex].responsiveImage.src}
+                data={recipe.image[currentImageIndex].responsiveImage}
+                alt={recipe.image[currentImageIndex].responsiveImage.alt}
                 objectFit={'cover'}
+                className="h-[420px]"
               />
-              <p>{recipe.author.username}</p>
-            </>
-          )}
+              <button
+                onClick={handlePreviousImage}
+                className="absolute top-0 left-0 bg-red-500 text-white p-2 rounded-r opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
+                title={'Previous'}
+              >
+                &lt;
+              </button>
+              <button
+                onClick={handleNextImage}
+                className="absolute top-0 right-0 bg-red-500 text-white p-2 rounded-l opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
+                title={'Next'}
+              >
+                &gt;
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center p-4">
+            {recipe.author?.image && (
+              <>
+                <div className={'max-h-8 max-w-8'}>
+                  <Image
+                    data={recipe.author.image.responsiveImage}
+                    alt={recipe.author.image.responsiveImage.alt}
+                    className="rounded-full"
+                  />
+                </div>
+                <Link href={`/account?user=${recipe.author.id}`}>
+                  <p className="pl-2 text-red-600 hover:underline">{recipe.author.username}</p>
+                </Link>
+              </>
+            )}
+            <div className={'flex-grow flex justify-end items-center gap-2'}>
+              <button onClick={handleLike} className="bg-red-500 text-white py-2 px-4 rounded">
+                <FontAwesomeIcon icon={faHeart} /> {likes}
+              </button>
+              <button onClick={() => window.print()} className="bg-red-500 text-white py-2 px-4 rounded">
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+              <a
+                href={`mailto:?subject=${recipe.title}&body=Check out this recipe: ${currentUrl}`}
+                className="bg-red-500 text-white py-2 px-4 rounded"
+              >
+                <FontAwesomeIcon icon={faEnvelope} />
+              </a>
+            </div>
+          </div>
+          <h1 className="text-red-600 text-4xl font-bold p-4">{recipe.title}</h1>
+          <p className="text-black p-4">{recipe.description}</p>
+          <div className={'grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'}>
+            <div>
+              <h3 className="text-red-600 text-2xl font-bold p-4">Raaka-aineet</h3>
+              <ul className="list-disc pl-8">
+                {recipe.incredients.map((ingredient, index) => (
+                  <li key={index} className="text-black p-2">
+                    {ingredient.incredient} {ingredient.amount} {ingredient.unit}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-red-600 text-2xl font-bold p-4">Ohje</h3>
+              <ol className="list-decimal pl-8">
+                {recipe.instructions.map((instruction, index) => (
+                  <li key={index} className="text-black p-2">
+                    {instruction.instruction}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
