@@ -21,12 +21,12 @@ TailwindCSS is used for styling frontend.
 
 ## Running in development environment
 
-- Clone the repository `git clone <repo-url>`
-- Change directory to recipe app `cd recipeapp`
-- Install dependacies `npm install`
-- Copy `env.example` into `env.local` with `cp env.example env.local`
-- Change `NEXT_DATOCMS_API_TOKEN` value to the correct API-token (that can be found from [DatoCMS](https://recipeapp.admin.datocms.com/project_settings/access_tokens))
-- Start dev server `npm run dev`
+1. Clone the repository `git clone <repo-url>`
+2. Change directory to recipe app `cd recipeapp`
+3. Install dependacies `npm install`
+4. Copy `env.example` into `env.local` with `cp env.example env.local`
+5. Change `NEXT_DATOCMS_API_TOKEN` value to the correct API-token (that can be found from [DatoCMS](https://recipeapp.admin.datocms.com/project_settings/access_tokens))
+6. Start dev server `npm run dev`
 
 # Contributing
 
