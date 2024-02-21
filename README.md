@@ -25,7 +25,7 @@ TailwindCSS is used for styling frontend.
 - Change directory to recipe app `cd recipeapp`
 - Install dependacies `npm install`
 - Copy `env.example` into `env.local` with `cp env.example env.local`
-- Change `NEXT_DATOCMS_API_TOKEN` value to the correct one
+- Change `NEXT_DATOCMS_API_TOKEN` value to the correct API-token (that can be found from discord or DatoCMS project settings)
 - Start dev server `npm run dev`
 
 # Contributing
