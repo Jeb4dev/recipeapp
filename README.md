@@ -24,7 +24,7 @@ TailwindCSS is used for styling frontend.
 - Clone the repository `git clone <repo-url>`
 - Change directory to recipe app `cd recipeapp`
 - Install dependacies `npm install`
-- Copy `env.example` `into env.local` with `cp env.example env.local`
+- Copy `env.example` into `env.local` with `cp env.example env.local`
 - Change `NEXT_DATOCMS_API_TOKEN` value to the correct one
 - Start dev server `npm run dev`
 
