@@ -1,29 +1,75 @@
 import Layout from '../../components/layout';
 import { request } from '../../lib/datocms';
 import { Image } from 'react-datocms';
+import { useState } from 'react';
 
 export default function RecipePage(props) {
   const recipe = props.data.recipe;
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((currentImageIndex + 1) % recipe.image.length);
+  };
+
+  const handlePreviousImage = () => {
+    setCurrentImageIndex((currentImageIndex - 1 + recipe.image.length) % recipe.image.length);
+  };
+
   return (
     <Layout>
-      <div>
-        <div className="flex">
-          {recipe.image.map((img, index) => (
-            <Image
-              key={index}
-              className={'h-[600px] w-[600px]'}
-              data={img.responsiveImage}
-              alt={img.responsiveImage.alt}
-              objectFit={'cover'}
-            />
-          ))}
+      <div className="container mx-auto px-4">
+        <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
+        <div className="flex items-center">
+          <button
+            onClick={handlePreviousImage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Previous
+          </button>
+          <Image
+            key={recipe.image[currentImageIndex].responsiveImage.src}
+            className={'h-[600px] w-[600px]'}
+            data={recipe.image[currentImageIndex].responsiveImage}
+            alt={recipe.image[currentImageIndex].responsiveImage.alt}
+            objectFit={'cover'}
+          />
+          <button
+            onClick={handleNextImage}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Next
+          </button>
         </div>
-        <div className={'px-10'}>
-          <div className={'flex justify-between items-center'}>
-            <h1 className="text-2xl font-bold my-4">{recipe.title}</h1>
-            <p className="text-2xl">{`⭐️ ${recipe.likes}`}</p>
-          </div>
-          <p className="text-gray-700 text-base">{recipe.description}</p>
+        <p className="mt-4">{recipe.description}</p>
+        <h2 className="text-2xl font-bold mt-4">Ingredients</h2>
+        <ul className="list-disc ml-5">
+          {recipe.incredients.map((ingredient, index) => (
+            <li key={index} className="my-2">
+              {ingredient.amount} {ingredient.unit} {ingredient.name}
+            </li>
+          ))}
+        </ul>
+        <h2 className="text-2xl font-bold mt-4">Instructions</h2>
+        <ol className="list-decimal ml-5">
+          {recipe.instructions.map((instruction, index) => (
+            <li key={index} className="my-2">
+              {instruction.instruction}
+            </li>
+          ))}
+        </ol>
+        <h2 className="text-2xl font-bold mt-4">Author</h2>
+        <div className="flex items-center">
+          {recipe.author?.image && (
+            <>
+              <Image
+                data={recipe.author.image.responsiveImage}
+                className={'w-16 h-16 rounded-full mr-4'}
+                alt={recipe.author.image.responsiveImage.alt}
+                objectFit={'cover'}
+              />
+              <p>{recipe.author.username}</p>
+            </>
+          )}
         </div>
       </div>
     </Layout>
@@ -76,6 +122,35 @@ query MyQuery($id: ItemId) {
     description
     author {
       username
+      id
+      image {
+      responsiveImage {
+        width
+        webpSrcSet
+        srcSet
+        title
+        src
+        sizes
+        height
+        bgColor
+        base64
+        aspectRatio
+        alt
+      }
+    }
+    }
+    incredients {
+      amount
+      incredient
+      unit
+    }
+    instructions {
+      instruction
+    }
+  }
+  user {
+    username
+    image {
       id
     }
   }
