@@ -1,7 +1,12 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Layout from '../components/layout';
 
 export default function NewRecipe() {
+  const router = useRouter();
+  const [error, setError] = useState(null);
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState([]);
@@ -44,6 +49,26 @@ export default function NewRecipe() {
     setImages(newImages);
   };
 
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const likes = 0;
+    const author = heisenberg;
+
+    const response = await fetch('/api/recipe/addRecipe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, description, author, likes }),
+    });
+
+    if (response.ok) {
+      await router.push('/recipes');
+    } else {
+      const data = await response.json();
+      setError(data.error);
+    }
+  }
+
   return (
     <Layout title="New Recipe">
       <div className="max-w-4xl mx-auto p-8">
@@ -79,6 +104,7 @@ export default function NewRecipe() {
               placeholder="Write description of your recipe here."
             ></textarea>
           </div>
+          
           <div className="mb-4">
             <label htmlFor="ingredients" className="block mb-2">
               Ingredients:
@@ -132,7 +158,7 @@ export default function NewRecipe() {
               name="images"
               accept="image/*"
               onChange={handleImageChange}
-              multiple // Allow multiple file selection
+              multiple
               className="border rounded-md"
             />
           </div>
@@ -158,11 +184,32 @@ export default function NewRecipe() {
               ))}
             </ul>
           )}
+
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+
           <div>
-            <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">
-              Create Recipe
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <svg
+                    className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 2a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7.414A2 2 0 0016.414 6L12 1.586A2 2 0 0010.586 1H5zm1 2h4v1.586L14.414 8H6V4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </span>
+                Create Recipe
+              </button>
+            </div>
         </form>
       </div>
     </Layout>
