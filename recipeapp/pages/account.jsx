@@ -38,19 +38,23 @@ const AccountPage = (props) => {
 export default AccountPage;
 
 const ACCOUNT_QUERY = `
-{
-  user(filter: {id: {eq: "Wzxstkc8R6iQyPLfZc517Q"}}) {
-    name
-    username
-    email
+  query UserById($id: ItemId) {
+    user(filter: {id: {eq: $id}}) {
+      name
+      username
+      email
+    }
   }
-}
 `;
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
+  const { user } = context.query;
+
   const data = await request({
     query: ACCOUNT_QUERY,
+    variables: { id: user },
   });
+
   return {
     props: { data },
   };
