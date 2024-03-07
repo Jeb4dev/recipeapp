@@ -7,9 +7,9 @@ const HomePage = (props) => {
   const recipes = props.data.allRecipes;
   return (
     <Layout>
-      <div>
+      <div className={"bg-red-50"}>
         <div className={'max-w-7xl mx-auto'}>
-          <h1 className="text-2xl font-bold mb-4">Tykätyimmät reseptit</h1>
+          <h1 className="text-2xl font-bold my-4">Tykätyimmät reseptit</h1>
           <div className="flex flex-wrap justify-between">
             {recipes
               .sort((a, b) => b.likes - a.likes)
@@ -18,7 +18,7 @@ const HomePage = (props) => {
           </div>
         </div>
         <div className={'max-w-7xl mx-auto'}>
-          <h1 className="text-2xl font-bold mb-4">Uusimmat reseptit</h1>
+          <h1 className="text-2xl font-bold my-4">Uusimmat reseptit</h1>
           <div className="flex flex-wrap justify-around">
             {recipes
               .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
