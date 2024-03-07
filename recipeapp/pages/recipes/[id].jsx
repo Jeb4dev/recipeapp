@@ -54,7 +54,7 @@ export default function RecipePage(props) {
         </button>
       </div>
     ) : (
-      <div className={"text-black"}>No images</div>
+      <div className={'text-black'}>No images</div>
     );
   }
 

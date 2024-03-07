@@ -9,7 +9,7 @@ const RecipeCard = ({ recipe }) => {
     return image ? (
       <Image className="w-full h-48" alt={image.responsiveImage.alt} data={image.responsiveImage} objectFit={'cover'} />
     ) : (
-      <div className={"m-12"}>Image not found</div>
+      <div className={'m-12'}>Image not found</div>
     );
   }
   return (
