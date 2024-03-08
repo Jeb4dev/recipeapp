@@ -1,24 +1,32 @@
 // components/Header.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 
 function LoginProfileComponent() {
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    const sessionCookie = Cookies.get('session');
+    if (sessionCookie) {
+      const decodedCookie = decodeURIComponent(sessionCookie);
+      setSession(JSON.parse(decodedCookie));
+    }
+  }, []);
+
   let component = null;
-  const session = Cookies.get('session');
-  console.log(session);
 
-  component = (
-    <Link href={'/login'}>
-      <p className="text-white hover:text-gray-300">Login</p>
-    </Link>
-  );
-
-  if (Cookies.get('session')) {
+  if (session) {
     component = (
-      <Link href={'/profile'}>
-        <p className="text-white hover:text-gray-300">Cookies.get('session').username</p>
-      </Link>
+        <Link href={'/account'}>
+          <p className="text-white hover:text-gray-300">{session.username}</p>
+        </Link>
+    );
+  } else {
+    component = (
+        <Link href={'/login'}>
+          <p className="text-white hover:text-gray-300">Login</p>
+        </Link>
     );
   }
 

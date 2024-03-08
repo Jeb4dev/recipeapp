@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     console.log(iv, content);
 
     const cookie = serialize('session', JSON.stringify({ iv, content, username }), {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === 'production',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // One week
       path: '/',
