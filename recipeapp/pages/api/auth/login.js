@@ -7,14 +7,12 @@ export default async function handler(req, res) {
     const { email, password } = req.body;
     const user = await signIn(email, password);
     const username = user.name;
+    const userId = user.id;
 
     const sessionData = JSON.stringify(req.body);
     const { iv, content } = encrypt(sessionData);
 
-    console.log(sessionData);
-    console.log(iv, content);
-
-    const cookie = serialize('session', JSON.stringify({ iv, content, username }), {
+    const cookie = serialize('session', JSON.stringify({ iv, content, username, userId }), {
       httpOnly: process.env.NODE_ENV === 'production',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // One week
@@ -57,6 +55,7 @@ query MyQuery($email: String) {
   user(filter: {email: {eq: $email}}) {
     password
     name
+    id
   }
 }
 `;

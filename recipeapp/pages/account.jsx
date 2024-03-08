@@ -1,10 +1,20 @@
 import Layout from '../components/layout';
 import { request } from '../lib/datocms';
+import { useRouter } from 'next/router';
 
 const AccountPage = (props) => {
   const { data } = props;
-
   const user = data.user;
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const res = await fetch('/api/auth/logout', { method: 'POST' });
+    if (res.ok) {
+      await router.push('/login');
+    } else {
+      console.error('Failed to log out');
+    }
+  };
 
   return (
     <Layout>
@@ -30,6 +40,9 @@ const AccountPage = (props) => {
             <p className="text-gray-600">{user.email}</p>
           </div>
         </div>
+        <button onClick={handleLogout} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          Logout
+        </button>
       </div>
     </Layout>
   );
@@ -49,11 +62,35 @@ const ACCOUNT_QUERY = `
 
 export async function getServerSideProps(context) {
   const { user } = context.query;
+  const cookies = context.req.headers.cookie;
+  let data;
 
-  const data = await request({
-    query: ACCOUNT_QUERY,
-    variables: { id: user },
-  });
+  if (user) {
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: user },
+    });
+  } else {
+    if (!cookies) {
+      return {
+        redirect: {
+          destination: '/login',
+          permanent: false,
+        },
+      };
+    }
+    const cookieString = decodeURIComponent(cookies);
+    const session = JSON.parse(
+      cookieString
+        .split(';')
+        .find((c) => c.trim().startsWith('session'))
+        .split('=')[1],
+    );
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: session.userId },
+    });
+  }
 
   return {
     props: { data },
