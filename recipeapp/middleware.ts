@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Public routes that are available to everyone
-  const publicRoutes = ['/', '/login', '/register', '/recipes'];
+  const publicRoutes = ['/', '/login', '/register', '/recipes', '/account'];
   const limitedRoutes = ['/dashboard', '/newrecipe'];
 
   // Check if the path is a recipe route (e.g., '/recipes/PtGNUBBWSRyMInlrGu9ruQ')

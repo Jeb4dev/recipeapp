@@ -1,6 +1,29 @@
 // components/Header.js
 import React from 'react';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
+
+function LoginProfileComponent() {
+  let component = null;
+  const session = Cookies.get('session');
+  console.log(session);
+
+  component = (
+    <Link href={'/login'}>
+      <p className="text-white hover:text-gray-300">Login</p>
+    </Link>
+  );
+
+  if (Cookies.get('session')) {
+    component = (
+      <Link href={'/profile'}>
+        <p className="text-white hover:text-gray-300">Cookies.get('session').username</p>
+      </Link>
+    );
+  }
+
+  return component;
+}
 
 const Header = () => (
   <header className="bg-red-500 text-white p-4">
@@ -26,9 +49,7 @@ const Header = () => (
             </Link>
           </li>
           <li>
-            <Link href={'/login'}>
-              <p className="text-white hover:text-gray-300">Login</p>
-            </Link>
+            <LoginProfileComponent />
           </li>
         </ul>
       </nav>

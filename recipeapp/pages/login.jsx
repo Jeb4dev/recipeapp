@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();

@@ -5,12 +5,16 @@ import { encrypt } from '../../../utils/encrypt';
 export default async function handler(req, res) {
   try {
     const { email, password } = req.body;
-    await signIn(email, password);
+    const user = await signIn(email, password);
+    const username = user.name;
 
     const sessionData = JSON.stringify(req.body);
-    const encryptedSessionData = encrypt(sessionData);
+    const { iv, content } = encrypt(sessionData);
 
-    const cookie = serialize('session', encryptedSessionData, {
+    console.log(sessionData);
+    console.log(iv, content);
+
+    const cookie = serialize('session', JSON.stringify({ iv, content, username }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // One week
@@ -29,12 +33,13 @@ export default async function handler(req, res) {
 }
 
 async function signIn(email, password) {
-  const correctPassword = await getPassword(email);
-  if (password !== correctPassword) {
+  const user = await getPassword(email);
+  if (password !== user.password) {
     const error = new Error('Invalid credentials.');
     error.type = 'CredentialsSignin';
     throw error;
   }
+  return user;
 }
 
 async function getPassword(email) {
@@ -44,13 +49,14 @@ async function getPassword(email) {
       email: email,
     },
   });
-  return response.user.password;
+  return response.user;
 }
 
 const PASSWORD_QUERY = `
 query MyQuery($email: String) {
   user(filter: {email: {eq: $email}}) {
     password
+    name
   }
 }
 `;
