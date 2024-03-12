@@ -28,42 +28,50 @@ export default function RecipePage(props) {
     setCurrentImageIndex((currentImageIndex - 1 + recipe.image.length) % recipe.image.length);
   };
 
+  function ImageContainer() {
+    return recipe.image[currentImageIndex] ? (
+      <div className="relative group w-screen">
+        <Image
+          key={recipe.image[currentImageIndex]?.responsiveImage?.src}
+          data={recipe.image[currentImageIndex]?.responsiveImage}
+          alt={recipe.image[currentImageIndex]?.responsiveImage?.alt}
+          objectFit={'cover'}
+          className="h-[420px]"
+        />
+        <button
+          onClick={handlePreviousImage}
+          className="absolute top-0 left-0 bg-red-500 text-white p-2 rounded-r opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
+          title={'Previous'}
+        >
+          &lt;
+        </button>
+        <button
+          onClick={handleNextImage}
+          className="absolute top-0 right-0 bg-red-500 text-white p-2 rounded-l opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
+          title={'Next'}
+        >
+          &gt;
+        </button>
+      </div>
+    ) : (
+      <div className={'text-black'}>No images</div>
+    );
+  }
+
   return (
     <Layout>
       <div className={'bg-red-50 min-h-screen'}>
         <div className="max-w-screen-xl mx-auto">
           <div className="flex justify-center items-center w-full">
-            <div className="relative group w-screen">
-              <Image
-                key={recipe.image[currentImageIndex].responsiveImage.src}
-                data={recipe.image[currentImageIndex].responsiveImage}
-                alt={recipe.image[currentImageIndex].responsiveImage.alt}
-                objectFit={'cover'}
-                className="h-[420px]"
-              />
-              <button
-                onClick={handlePreviousImage}
-                className="absolute top-0 left-0 bg-red-500 text-white p-2 rounded-r opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
-                title={'Previous'}
-              >
-                &lt;
-              </button>
-              <button
-                onClick={handleNextImage}
-                className="absolute top-0 right-0 bg-red-500 text-white p-2 rounded-l opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
-                title={'Next'}
-              >
-                &gt;
-              </button>
-            </div>
+            <ImageContainer />
           </div>
           <div className="flex items-center p-4">
             {recipe.author?.image && (
               <>
                 <div className={'max-h-8 max-w-8'}>
                   <Image
-                    data={recipe.author.image.responsiveImage}
-                    alt={recipe.author.image.responsiveImage.alt}
+                    data={recipe.author.image?.responsiveImage}
+                    alt={recipe.author.image?.responsiveImage?.alt}
                     className="rounded-full"
                   />
                 </div>

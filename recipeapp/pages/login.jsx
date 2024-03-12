@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,8 +21,10 @@ export default function LoginPage() {
       body: JSON.stringify({ email, password }),
     });
 
-    if (response.ok) {
-      await router.push('/profile');
+    if (response.status === 200) {
+      console.log('Response status is 200, navigating to home page...');
+      setError(null);
+      await router.push('/');
     } else {
       const data = await response.json();
       setError(data.error);
