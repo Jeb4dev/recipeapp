@@ -52,7 +52,6 @@ export default function NewRecipe() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const likes = 0;
     const author = heisenberg;
 
     const response = await fetch('/api/recipe/addRecipe', {

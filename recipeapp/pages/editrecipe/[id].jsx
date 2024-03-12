@@ -1,211 +1,202 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
 import Layout from '../../components/layout';
 import { request } from '../../lib/datocms';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export default function EditRecipe({ recipeData }) {
+export default function EditRecipePage(props) {
   const router = useRouter();
-  const [error, setError] = useState(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [ingredients, setIngredients] = useState([]);
-  const [images, setImages] = useState([]);
+  const { id } = router.query;
+  const [recipe, setRecipe] = useState(props.data.recipe);
 
-  useEffect(() => {
-    if (recipeData) {
-      setTitle(recipeData.recipe.title);
-      setDescription(recipeData.recipe.description);
-      setIngredients(recipeData.recipe.incredients);
-      // Assuming you also need to set images, adjust this according to your data structure
-      setImages(recipeData.recipe.image);
+  // Function to handle changes in input fields
+  const handleInputChange = (event, index) => {
+    const { name, value } = event.target;
+    const updatedRecipe = { ...recipe };
+    if (name.startsWith('incredient')) {
+      // Update ingredient
+      const ingredientIndex = parseInt(name.split('-')[1]);
+      updatedRecipe.incredients[ingredientIndex][name.split('-')[0]] = value;
+    } else if (name.startsWith('instruction')) {
+      // Update instruction
+      const instructionIndex = parseInt(name.split('-')[1]);
+      updatedRecipe.instructions[instructionIndex][name.split('-')[0]] = value;
+    } else {
+      // Update other fields
+      updatedRecipe[name] = value;
     }
-  }, [recipeData]);
-
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+    setRecipe(updatedRecipe);
   };
 
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
-
-  // Add, remove, and handle ingredient functions here (similar to the NewRecipe component)
-
-  const handleImageChange = (e) => {
-    const selectedImages = Array.from(e.target.files);
-    setImages([...images, ...selectedImages]);
-  };
-
-  const handleRemoveImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
-  };
-
+  // Function to handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+    try {
+      const res = await fetch(`/api/editrecipe/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipe),
+      });
+      if (res.ok) {
+        router.push(`/recipes/${id}`);
+      } else {
+        throw new Error('Failed to update recipe.');
+      }
+    } catch (error) {
+      console.error('Error updating recipe:', error);
+      // Handle error
+    }
+  };
 
-    // Update the recipe with new data
-    const updatedRecipe = {
-      title,
-      description,
-      incredients: ingredients, // Assuming your API expects this key
-      image: images, // Assuming your API expects this key
-      // Assuming you need other data like author and likes, adjust this according to your data structure
-    };
-
-    // Send updated recipe to your backend to save changes
-    const response = await fetch(`/api/recipe/${recipeData.recipe.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedRecipe),
-    });
-
-    if (response.ok) {
-      await router.push(`/recipes/${recipeData.recipe.id}`);
-    } else {
-      const data = await response.json();
-      setError(data.error);
+  // Function to handle recipe deletion
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/editrecipe/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        router.push(`/recipes`);
+      } else {
+        throw new Error('Failed to delete recipe.');
+      }
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      // Handle error
     }
   };
 
   return (
-    <Layout title="Edit Recipe">
-      <div className="max-w-4xl mx-auto p-8">
-        <h1 className="text-3xl font-semibold mb-4">Edit Recipe</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="title" className="block mb-2">
-              Recipe Name:
-            </label>
+    <Layout>
+      <div className={'bg-red-50 min-h-screen'}>
+        <div className="max-w-screen-xl mx-auto">
+          <form onSubmit={handleSubmit}>
+            {/* Your form UI */}
+            {/* Title */}
             <input
               type="text"
-              id="title"
               name="title"
-              value={title}
-              onChange={handleTitleChange}
-              className="w-full px-4 py-2 border rounded-md text-black"
-              required
-              placeholder="Write recipe name here."
+              value={recipe.title}
+              onChange={handleInputChange}
+              placeholder="Title"
             />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="description" className="block mb-2">
-              Description:
-            </label>
+            {/* Description */}
             <textarea
-              id="description"
               name="description"
-              value={description}
-              onChange={handleDescriptionChange}
-              rows="4"
-              className="w-full px-4 py-2 border rounded-md text-black"
-              required
-              placeholder="Write description of your recipe here."
-            ></textarea>
-          </div>
-          {/* Form fields for ingredients and images can be added similarly */}
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 px-4 rounded"
-          >
-            Save Changes
-          </button>
-          {error && <p className="text-red-500">{error}</p>}
-        </form>
+              value={recipe.description}
+              onChange={handleInputChange}
+              placeholder="Description"
+            />
+            {/* Ingredients */}
+            {recipe.incredients.map((ingredient, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  name={`incredient-${index}`}
+                  value={ingredient.incredient}
+                  onChange={(event) => handleInputChange(event, index)}
+                  placeholder="Ingredient"
+                />
+                <input
+                  type="text"
+                  name={`amount-${index}`}
+                  value={ingredient.amount}
+                  onChange={(event) => handleInputChange(event, index)}
+                  placeholder="Amount"
+                />
+                <input
+                  type="text"
+                  name={`unit-${index}`}
+                  value={ingredient.unit}
+                  onChange={(event) => handleInputChange(event, index)}
+                  placeholder="Unit"
+                />
+              </div>
+            ))}
+            {/* Instructions */}
+            {recipe.instructions.map((instruction, index) => (
+              <input
+                key={index}
+                type="text"
+                name={`instruction-${index}`}
+                value={instruction.instruction}
+                onChange={(event) => handleInputChange(event, index)}
+                placeholder={`Step ${index + 1}`}
+              />
+            ))}
+            <button type="submit">Save</button>
+            <button type="button" onClick={handleDelete}>Delete</button>
+          </form>
+        </div>
       </div>
     </Layout>
   );
 }
 
-export async function getStaticPaths() {
-  const PATHS_QUERY = `
-    query MyQuery {
-      allRecipes {
-        id
-      }
-    }
-  `;
-
-  const recipeQuery = await request({
-    query: PATHS_QUERY,
-  });
-
-  const paths = recipeQuery.allRecipes.map((recipe) => ({
-    params: { id: recipe.id.toString() }, // Ensure the id is converted to a string
-  }));
-
-  return {
-    paths,
-    fallback: false,
-  };
-}
-
-
-// Fetch recipe data based on the ID provided in the URL
-export const getStaticProps = async ({ params }) => {
-  const POST_QUERY = `
-    query MyQuery($id: ItemId) {
-      recipe(filter: {id: {eq: $id}}) {
-        id
-        image {
-          responsiveImage {
-            width
-            webpSrcSet
-            srcSet
-            title
-            src
-            sizes
-            height
-            bgColor
-            base64
-            aspectRatio
-            alt
-          }
-        }
-        likes
+const GET_RECIPE_QUERY = `
+query MyQuery($id: ItemId) {
+  recipe(filter: {id: {eq: $id}}) {
+    id
+    image {
+      responsiveImage {
+        width
+        webpSrcSet
+        srcSet
         title
-        description
-        author {
-          username
-          id
-          image {
-            responsiveImage {
-              width
-              webpSrcSet
-              srcSet
-              title
-              src
-              sizes
-              height
-              bgColor
-              base64
-              aspectRatio
-              alt
-            }
-          }
-        }
-        incredients {
-          amount
-          incredient
-          unit
-        }
-        instructions {
-          instruction
-        }
+        src
+        sizes
+        height
+        bgColor
+        base64
+        aspectRatio
+        alt
       }
     }
-  `;
+    title
+    description
+    author {
+      username
+      id
+    }
+    incredients {
+      amount
+      incredient
+      unit
+    }
+    instructions {
+      instruction
+    }
+  }
+}
+`;
+
+export const getStaticProps = async ({ params }) => {
   const data = await request({
-    query: POST_QUERY,
+    query: GET_RECIPE_QUERY,
     variables: {
       id: params.id,
     },
   });
 
   return {
-    props: {
-      recipeData: data,
-    },
+    props: { data },
   };
 };
+
+export async function getStaticPaths() {
+  const recipesQuery = await request({
+    query: `
+      query {
+        allRecipes {
+          id
+        }
+      }
+    `,
+  });
+
+  const paths = recipesQuery.allRecipes.map((recipe) => ({
+    params: { id: recipe.id.toString() },
+  }));
+
+  return { paths, fallback: false };
+}
