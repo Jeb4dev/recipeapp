@@ -10,8 +10,8 @@ export default function RecipesPage({ data }) {
   const filteredRecipes = recipes.filter(
     (recipe) =>
       recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (recipe.incredients &&
-        recipe.incredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))),
+      (recipe.ingredients &&
+        recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))),
   );
 
   return (
@@ -43,7 +43,7 @@ const ALL_RECIPES_QUERY = `
         likes
         description
         _createdAt
-        incredients {
+        ingredients {
             name
         }
         image {

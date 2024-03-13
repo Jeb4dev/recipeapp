@@ -12,10 +12,10 @@ export default function EditRecipePage(props) {
   const handleInputChange = (event, index) => {
     const { name, value } = event.target;
     const updatedRecipe = { ...recipe };
-    if (name.startsWith('incredient')) {
+    if (name.startsWith('ingredient')) {
       // Update ingredient
       const ingredientIndex = parseInt(name.split('-')[1]);
-      updatedRecipe.incredients[ingredientIndex][name.split('-')[0]] = value;
+      updatedRecipe.ingredients[ingredientIndex][name.split('-')[0]] = value;
     } else if (name.startsWith('instruction')) {
       // Update instruction
       const instructionIndex = parseInt(name.split('-')[1]);
@@ -82,12 +82,12 @@ export default function EditRecipePage(props) {
               placeholder="Description"
             />
             {/* Ingredients */}
-            {recipe.incredients.map((ingredient, index) => (
+            {recipe.ingredients.map((ingredient, index) => (
               <div key={index}>
                 <input
                   type="text"
-                  name={`incredient-${index}`}
-                  value={ingredient.incredient}
+                  name={`ingredient-${index}`}
+                  value={ingredient.ingredient}
                   onChange={(event) => handleInputChange(event, index)}
                   placeholder="Ingredient"
                 />
@@ -154,9 +154,9 @@ query MyQuery($id: ItemId) {
       username
       id
     }
-    incredients {
+    ingredients {
       amount
-      incredient
+      ingredient
       unit
     }
     instructions {
