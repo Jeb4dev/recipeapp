@@ -62,7 +62,7 @@ const NewRecipePage = () => {
       formData.append('title', title);
       formData.append('description', description);
       formData.append('serving', serving);
-      formData.append('author', 'heisenberg');
+      formData.append('author', 'heisenbergi');
       ingredients.forEach((ingredient, index) => {
         formData.append(`ingredients[${index}][name]`, ingredient.name);
         formData.append(`ingredients[${index}][amount]`, ingredient.amount);
