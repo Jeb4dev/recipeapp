@@ -72,11 +72,6 @@ const Header = () => (
             </Link>
           </li>
           <li>
-            <Link href={'/about'}>
-              <p className="text-white hover:text-gray-300">About</p>
-            </Link>
-          </li>
-          <li>
             <LoginProfileComponent />
           </li>
         </ul>
