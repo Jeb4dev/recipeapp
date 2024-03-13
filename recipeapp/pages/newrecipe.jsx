@@ -1,216 +1,157 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import Layout from '../components/layout';
 
-export default function NewRecipe() {
+const NewRecipePage = () => {
   const router = useRouter();
-  const [error, setError] = useState(null);
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState([]);
-  const [ingredientInput, setIngredientInput] = useState('');
+  const [instructions, setInstructions] = useState([]);
+  const [serving, setServing] = useState('');
   const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+  const addIngredient = () => {
+    setIngredients([...ingredients, { name: '', amount: '', unit: '' }]);
   };
 
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
-
-  const handleIngredientChange = (e) => {
-    setIngredientInput(e.target.value);
-  };
-
-  const handleAddIngredient = () => {
-    if (ingredientInput.trim() !== '') {
-      setIngredients([...ingredients, ingredientInput]);
-      setIngredientInput('');
-    }
-  };
-
-  const handleRemoveIngredient = (index) => {
+  const removeIngredient = (index) => {
     const newIngredients = [...ingredients];
     newIngredients.splice(index, 1);
     setIngredients(newIngredients);
   };
 
-  const handleImageChange = (e) => {
-    const selectedImages = Array.from(e.target.files);
-    setImages([...images, ...selectedImages]);
+  const addInstruction = () => {
+    setInstructions([...instructions, { instruction: '' }]);
   };
 
-  const handleRemoveImage = (index) => {
+  const removeInstruction = (index) => {
+    const newInstructions = [...instructions];
+    newInstructions.splice(index, 1);
+    setInstructions(newInstructions);
+  };
+
+  const handleIngredientChange = (index, event) => {
+    const { name, value } = event.target;
+    const newIngredients = [...ingredients];
+    newIngredients[index][name] = value;
+    setIngredients(newIngredients);
+  };
+
+  const handleInstructionChange = (index, event) => {
+    const { value } = event.target;
+    const newInstructions = [...instructions];
+    newInstructions[index].instruction = value;
+    setInstructions(newInstructions);
+  };
+
+  const handleImageChange = (event) => {
     const newImages = [...images];
-    newImages.splice(index, 1);
+    for (const file of event.target.files) {
+      newImages.push(file);
+    }
     setImages(newImages);
   };
 
-  async function handleSubmit(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const author = heisenberg;
+    try {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('serving', serving);
+      formData.append('author', 'heisenberg');
+      ingredients.forEach((ingredient, index) => {
+        formData.append(`ingredients[${index}][name]`, ingredient.name);
+        formData.append(`ingredients[${index}][amount]`, ingredient.amount);
+        formData.append(`ingredients[${index}][unit]`, ingredient.unit);
+      });
+      instructions.forEach((instruction, index) => {
+        formData.append(`instructions[${index}][instruction]`, instruction.instruction);
+      });
+      images.forEach((image, index) => {
+        formData.append(`images[${index}]`, image);
+      });
 
-    const response = await fetch('/api/recipe/addRecipe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, author, likes }),
-    });
+      const response = await fetch('/api/createRecipe', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (response.ok) {
-      await router.push('/recipes');
-    } else {
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error);
+      }
+
       const data = await response.json();
-      setError(data.error);
+      console.log('New recipe created:', data.recipe);
+      // Reset form after successful submission
+      setTitle('');
+      setDescription('');
+      setIngredients([]);
+      setInstructions([]);
+      setServing('');
+      setImages([]);
+      setError('');
+      // Redirect to the newly created recipe page or any other page as needed
+      router.push(`/recipes/${data.recipe.id}`);
+    } catch (error) {
+      console.error('Error creating new recipe:', error.message);
+      setError('Error creating new recipe. Please try again.');
     }
-  }
+  };
 
   return (
-    <Layout title="New Recipe">
-      <div className="max-w-4xl mx-auto p-8">
-        <h1 className="text-3xl font-semibold mb-4">New Recipe</h1>
-        <form>
+    <Layout>
+      <div className="max-w-4xl mx-auto py-8">
+        <h1 className="text-3xl font-semibold mb-4">Create a New Recipe</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <label className="block mb-4">
+            Title:
+            <input className="border border-gray-300 px-4 py-2 mt-2 w-full" type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+          </label>
+          <label className="block mb-4">
+            Description:
+            <textarea className="border border-gray-300 px-4 py-2 mt-2 w-full" value={description} onChange={(e) => setDescription(e.target.value)} />
+          </label>
           <div className="mb-4">
-            <label htmlFor="title" className="block mb-2">
-              Recipe Name:
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={title}
-              onChange={handleTitleChange}
-              className="w-full px-4 py-2 border rounded-md text-black"
-              required
-              placeholder="Write recipe name here."
-            />
+            <label className="block mb-2">Ingredients:</label>
+            {ingredients.map((ingredient, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input className="border border-gray-300 px-2 py-1 mr-2 w-1/3" type="text" name="name" value={ingredient.name} onChange={(e) => handleIngredientChange(index, e)} placeholder="Name" />
+                <input className="border border-gray-300 px-2 py-1 mr-2 w-1/3" type="text" name="amount" value={ingredient.amount} onChange={(e) => handleIngredientChange(index, e)} placeholder="Amount" />
+                <input className="border border-gray-300 px-2 py-1 mr-2 w-1/3" type="text" name="unit" value={ingredient.unit} onChange={(e) => handleIngredientChange(index, e)} placeholder="Unit" />
+                <button type="button" onClick={() => removeIngredient(index)} className="text-red-500 px-2 py-1 bg-transparent border border-red-500 rounded">Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={addIngredient} className="bg-blue-500 text-white px-4 py-2 rounded">Add Ingredient</button>
           </div>
           <div className="mb-4">
-            <label htmlFor="description" className="block mb-2">
-              Description:
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={description}
-              onChange={handleDescriptionChange}
-              rows="4"
-              className="w-full px-4 py-2 border rounded-md text-black"
-              required
-              placeholder="Write description of your recipe here."
-            ></textarea>
+            <label className="block mb-2">Instructions:</label>
+            {instructions.map((instruction, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <textarea className="border border-gray-300 px-4 py-2 mr-2 w-full" value={instruction.instruction} onChange={(e) => handleInstructionChange(index, e)} placeholder={`Step ${index + 1}`} />
+                <button type="button" onClick={() => removeInstruction(index)} className="text-red-500 px-2 py-1 bg-transparent border border-red-500 rounded">Remove</button>
+              </div>
+            ))}
+            <button type="button" onClick={addInstruction} className="bg-blue-500 text-white px-4 py-2 rounded">Add Instruction</button>
           </div>
-
-          <div className="mb-4">
-            <label htmlFor="ingredients" className="block mb-2">
-              Ingredients:
-            </label>
-            <input
-              type="text"
-              id="ingredients"
-              name="ingredients"
-              value={ingredientInput}
-              onChange={handleIngredientChange}
-              className="w-full px-4 py-2 border rounded-md text-black"
-              placeholder='Type your ingredient, then click "Add Ingredient" button to add it to the list of ingredients.'
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleAddIngredient}
-            className="bg-red-500 text-white px-4 py-2 rounded-md mb-4"
-          >
-            Add Ingredient
-          </button>
-          {ingredients.length > 0 && (
-            <ul className="mb-4">
-              {ingredients.map((ingredient, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="mr-2">{ingredient}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveIngredient(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div className="mb-4">
-            <label htmlFor="images" className="block mb-2">
-              Images:
-            </label>
-            <input
-              type="file"
-              id="images"
-              name="images"
-              accept="image/*"
-              onChange={handleImageChange}
-              multiple
-              className="border rounded-md"
-            />
-          </div>
-          {images.length > 0 && (
-            <ul className="mb-4">
-              {images.map((image, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="mr-2">{image.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveImage(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                <svg
-                  className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5 2a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7.414A2 2 0 0016.414 6L12 1.586A2 2 0 0010.586 1H5zm1 2h4v1.586L14.414 8H6V4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-              Create Recipe
-            </button>
-          </div>
+          <label className="block mb-4">
+            Serving:
+            <input className="border border-gray-300 px-4 py-2 mt-2 w-full" type="text" value={serving} onChange={(e) => setServing(e.target.value)} />
+          </label>
+          <label className="block mb-4">
+            Add Images:
+            <input className="border border-gray-300 px-4 py-2 mt-2 w-full" type="file" accept="image/*" multiple onChange={handleImageChange} />
+          </label>
+          <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Submit</button>
         </form>
       </div>
     </Layout>
   );
-}
+};
+
+export default NewRecipePage;
