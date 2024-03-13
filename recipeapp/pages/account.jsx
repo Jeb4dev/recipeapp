@@ -6,7 +6,6 @@ import { useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
 
 const AccountPage = (props) => {
-
   const { data } = props;
   const user = data.user;
   const router = useRouter();
@@ -120,18 +119,17 @@ const AccountPage = (props) => {
           <div className="flex flex-wrap justify-between">
             {recipes
               .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => <RecipeCard key={index} recipe={recipe} />)
-              }
+              .map((recipe, index) => (
+                <RecipeCard key={index} recipe={recipe} />
+              ))}
           </div>
         </div>
-        
       </div>
     </Layout>
   );
 };
 
 export default AccountPage;
-
 
 const ACCOUNT_QUERY = `
   query UserById($id: ItemId) {
@@ -187,24 +185,24 @@ export async function getServerSideProps(context) {
   }
 
   const cookieString = decodeURIComponent(cookies);
-    session = JSON.parse(
-      cookieString
-        .split(';')
-        .find((c) => c.trim().startsWith('session'))
-        .split('=')[1],
-    );
+  session = JSON.parse(
+    cookieString
+      .split(';')
+      .find((c) => c.trim().startsWith('session'))
+      .split('=')[1],
+  );
 
-    if (user) {
-      data = await request({
-        query: ACCOUNT_QUERY,
-        variables: { id: user },
-      });
-    } else {
-      data = await request({
-        query: ACCOUNT_QUERY,
-        variables: { id: session.userId },
-      });
-    }
+  if (user) {
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: user },
+    });
+  } else {
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: session.userId },
+    });
+  }
 
   // Hakee käyttäjän omat reseptit käyttäen OWN_RECIPES_QUERY-kyselyä
   ownRecipesData = await request({
