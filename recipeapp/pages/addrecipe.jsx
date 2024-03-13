@@ -11,7 +11,7 @@ export default function AddRecipe() {
     instructions: [{ instruction: '' }],
     images: [],
     serving: 1,
-    author: heisenbergi // PLACEHOLDER
+    author: heisenbergi, // PLACEHOLDER
   });
 
   const handleInputChange = (event, index, type) => {
@@ -138,7 +138,11 @@ export default function AddRecipe() {
                 placeholder="Unit"
               />
               {index === recipe.incredients.length - 1 && (
-                <button type="button" onClick={() => handleAddField('incredients')} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                <button
+                  type="button"
+                  onClick={() => handleAddField('incredients')}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                >
                   Add Ingredient
                 </button>
               )}
@@ -159,7 +163,11 @@ export default function AddRecipe() {
                 placeholder={`Step ${index + 1}`}
               />
               {index === recipe.instructions.length - 1 && (
-                <button type="button" onClick={() => handleAddField('instructions')} className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                <button
+                  type="button"
+                  onClick={() => handleAddField('instructions')}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md"
+                >
                   Add Instruction
                 </button>
               )}
@@ -172,5 +180,4 @@ export default function AddRecipe() {
       </form>
     </div>
   );
-  
 }

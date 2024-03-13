@@ -6,7 +6,16 @@ export default async function handler(req, res) {
   if (method === 'PUT') {
     try {
       const { recipeId, title, description, ingredients, instructions, serving, images, author } = body;
-      const updatedRecipe = await updateRecipe(recipeId, title, description, ingredients, instructions, serving, images, author);
+      const updatedRecipe = await updateRecipe(
+        recipeId,
+        title,
+        description,
+        ingredients,
+        instructions,
+        serving,
+        images,
+        author,
+      );
 
       res.status(200).json({ recipe: updatedRecipe });
     } catch (error) {
@@ -52,11 +61,11 @@ async function updateRecipe(recipeId, title, description, ingredients, instructi
     const updateData = {
       title,
       description,
-      ingredients: ingredients.map(ingredient => ({ ...ingredient })),
-      instructions: instructions.map(instruction => ({ ...instruction })),
+      ingredients: ingredients.map((ingredient) => ({ ...ingredient })),
+      instructions: instructions.map((instruction) => ({ ...instruction })),
       serving,
-      images: images.map(image => ({ ...image })),
-      author: author // Add the author field
+      images: images.map((image) => ({ ...image })),
+      author: author, // Add the author field
     };
     return await client.items.update(recipeId, updateData);
   } catch (error) {

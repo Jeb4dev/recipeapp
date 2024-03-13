@@ -37,11 +37,11 @@ async function createRecipe(title, description, ingredients, instructions, servi
       item_type: { type: 'item_type', id: 'InWodoopRq2APQiyEmYXGQ' },
       title: title,
       description: description,
-      ingredients: ingredients.map(ingredient => ({ ...ingredient })),
-      instructions: instructions.map(instruction => ({ ...instruction })),
+      ingredients: ingredients.map((ingredient) => ({ ...ingredient })),
+      instructions: instructions.map((instruction) => ({ ...instruction })),
       serving: serving,
-      images: images.map(image => ({ ...image })),
-      author: author
+      images: images.map((image) => ({ ...image })),
+      author: author,
     });
     console.log('Created a new recipe');
     return record;

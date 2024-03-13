@@ -73,13 +73,7 @@ export default function EditRecipePage(props) {
           <form onSubmit={handleSubmit}>
             {/* Your form UI */}
             {/* Title */}
-            <input
-              type="text"
-              name="title"
-              value={recipe.title}
-              onChange={handleInputChange}
-              placeholder="Title"
-            />
+            <input type="text" name="title" value={recipe.title} onChange={handleInputChange} placeholder="Title" />
             {/* Description */}
             <textarea
               name="description"
@@ -125,7 +119,9 @@ export default function EditRecipePage(props) {
               />
             ))}
             <button type="submit">Save</button>
-            <button type="button" onClick={handleDelete}>Delete</button>
+            <button type="button" onClick={handleDelete}>
+              Delete
+            </button>
           </form>
         </div>
       </div>
