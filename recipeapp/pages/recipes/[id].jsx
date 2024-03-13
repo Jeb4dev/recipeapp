@@ -103,7 +103,7 @@ export default function RecipePage(props) {
               <ul className="list-disc pl-8">
                 {recipe.incredients.map((ingredient, index) => (
                   <li key={index} className="text-black p-2">
-                    {ingredient.incredient} {ingredient.amount} {ingredient.unit}
+                    {ingredient.name} {ingredient.amount} {ingredient.unit}
                   </li>
                 ))}
               </ul>
@@ -190,7 +190,7 @@ query MyQuery($id: ItemId) {
     }
     incredients {
       amount
-      incredient
+      name
       unit
     }
     instructions {
