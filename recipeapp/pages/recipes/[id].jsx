@@ -12,6 +12,19 @@ export default function RecipePage(props) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentUrl, setCurrentUrl] = useState('');
 
+  const initialServingSize = recipe.serving || 1;
+  const [servingSize, setServingSize] = useState(initialServingSize);
+
+  const incrementServingSize = () => {
+    setServingSize(servingSize + 1);
+  };
+
+  const decrementServingSize = () => {
+    if (servingSize > 1) {
+      setServingSize(servingSize - 1);
+    }
+  };
+
   useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
@@ -99,11 +112,29 @@ export default function RecipePage(props) {
           <p className="text-black p-4">{recipe.description}</p>
           <div className={'grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4'}>
             <div>
-              <h3 className="text-red-600 text-2xl font-bold p-4">Raaka-aineet</h3>
+              <div className="flex items-center">
+                <button
+                  className={'bg-red-500 text-white py-1 px-3 rounded text-3xl flex justify-center items-center'}
+                  onClick={decrementServingSize}
+                >
+                  -
+                </button>
+                <p className={'text-black py-2 px-4 rounded text-2xl'}>{servingSize} annosta</p>
+                <button
+                  className={'bg-red-500 text-white py-1 px-3 rounded text-3xl flex justify-center items-center'}
+                  onClick={incrementServingSize}
+                >
+                  +
+                </button>
+              </div>
+              <h3 className="text-red-600 text-2xl font-bold p-4">Ingredients</h3>
               <ul className="list-disc pl-8">
                 {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="text-black p-2">
-                    {ingredient.name} {ingredient.amount} {ingredient.unit}
+                  <li key={index} className={`text-black p-2 ${ingredient.name.startsWith('--') ? 'list-none' : ''}`}>
+                    {ingredient.amount === 0
+                      ? ''
+                      : parseFloat(((ingredient.amount * servingSize) / initialServingSize).toFixed(2))}{' '}
+                    {ingredient.unit} <span className={'font-semibold'}>{ingredient.name}</span>
                   </li>
                 ))}
               </ul>
@@ -167,6 +198,7 @@ query MyQuery($id: ItemId) {
       }
     }
     likes
+    serving
     title
     description
     author {
@@ -187,13 +219,13 @@ query MyQuery($id: ItemId) {
         alt
       }
     }
-    }
-    ingredients {
+  }
+  ingredients {
       amount
       name
       unit
-    }
-    instructions {
+  }
+  instructions {
       instruction
     }
   }
