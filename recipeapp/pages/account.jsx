@@ -50,6 +50,9 @@ const AccountPage = (props) => {
   };
 
   const recipes = props.data.ownRecipes;
+  const userRecipes = recipes.filter(recipe => recipe.author.id === user.id);
+
+
 
   // Tarkista, että recipes on määritelty ja se on taulukko
   if (!recipes || !Array.isArray(recipes)) {
@@ -117,7 +120,7 @@ const AccountPage = (props) => {
         <div className={'max-w-7xl mx-auto'}>
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
           <div className="flex flex-wrap justify-between">
-            {recipes
+            {userRecipes
               .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
               .map((recipe, index) => (
                 <RecipeCard key={index} recipe={recipe} />
@@ -143,7 +146,7 @@ const ACCOUNT_QUERY = `
 `;
 const OWN_RECIPES_QUERY = `
   query RecipesByUser($Id: ItemId) {
-    allRecipes(filter: {id: {eq: $Id}}) {
+    allRecipes(filter: {author: {eq: $Id}}) {
       id
       title
       likes
@@ -163,6 +166,9 @@ const OWN_RECIPES_QUERY = `
           webpSrcSet
           width
         }
+      }
+      author {
+        id
       }
     }
   }
