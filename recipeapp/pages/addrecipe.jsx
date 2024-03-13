@@ -7,7 +7,7 @@ export default function AddRecipe() {
   const [recipe, setRecipe] = useState({
     title: '',
     description: '',
-    incredients: [{ incredient: '', amount: '', unit: '' }],
+    ingredients: [{ ingredient: '', amount: '', unit: '' }],
     instructions: [{ instruction: '' }],
     images: [],
     serving: 1,
@@ -17,8 +17,8 @@ export default function AddRecipe() {
   const handleInputChange = (event, index, type) => {
     const { name, value } = event.target;
     const updatedRecipe = { ...recipe };
-    if (type === 'incredients') {
-      updatedRecipe.incredients[index][name] = value;
+    if (type === 'ingredients') {
+      updatedRecipe.ingredients[index][name] = value;
     } else if (type === 'instructions') {
       updatedRecipe.instructions[index][name] = value;
     } else {
@@ -28,10 +28,10 @@ export default function AddRecipe() {
   };
 
   const handleAddField = (type) => {
-    if (type === 'incredients') {
+    if (type === 'ingredients') {
       setRecipe({
         ...recipe,
-        incredients: [...recipe.incredients, { incredient: '', amount: '', unit: '' }],
+        ingredients: [...recipe.ingredients, { ingredient: '', amount: '', unit: '' }],
       });
     } else if (type === 'instructions') {
       setRecipe({
@@ -111,13 +111,13 @@ export default function AddRecipe() {
         {/* Ingredients */}
         <div>
           <h2 className="text-xl font-semibold">Ingredients:</h2>
-          {recipe.incredients.map((ingredient, index) => (
+          {recipe.ingredients.map((ingredient, index) => (
             <div key={index} className="flex space-x-2">
               <input
                 type="text"
-                name={`incredient-${index}`}
-                value={ingredient.incredient}
-                onChange={(event) => handleInputChange(event, index, 'incredients')}
+                name={`ingredient-${index}`}
+                value={ingredient.ingredient}
+                onChange={(event) => handleInputChange(event, index, 'ingredients')}
                 className="flex-1 px-4 py-2 border rounded-md text-black"
                 placeholder="Ingredient"
               />
@@ -125,7 +125,7 @@ export default function AddRecipe() {
                 type="text"
                 name={`amount-${index}`}
                 value={ingredient.amount}
-                onChange={(event) => handleInputChange(event, index, 'incredients')}
+                onChange={(event) => handleInputChange(event, index, 'ingredients')}
                 className="w-24 px-4 py-2 border rounded-md text-black"
                 placeholder="Amount"
               />
@@ -133,14 +133,14 @@ export default function AddRecipe() {
                 type="text"
                 name={`unit-${index}`}
                 value={ingredient.unit}
-                onChange={(event) => handleInputChange(event, index, 'incredients')}
+                onChange={(event) => handleInputChange(event, index, 'ingredients')}
                 className="w-24 px-4 py-2 border rounded-md text-black"
                 placeholder="Unit"
               />
-              {index === recipe.incredients.length - 1 && (
+              {index === recipe.ingredients.length - 1 && (
                 <button
                   type="button"
-                  onClick={() => handleAddField('incredients')}
+                  onClick={() => handleAddField('ingredients')}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md"
                 >
                   Add Ingredient
