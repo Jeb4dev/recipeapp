@@ -16,19 +16,23 @@ export default function RecipesPage({ data }) {
 
   return (
     <Layout>
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">All Recipes</h1>
-        <input
-          type="text"
-          placeholder="Search by name or ingredient"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="mb-4 p-2 border rounded"
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {filteredRecipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
+      <div className="py-10 mx-auto max-w-[90%]">
+        <div>
+          <div className="px-10">
+            <h1 className="text-2xl font-bold mb-4">All Recipes</h1>
+            <input
+              type="text"
+              placeholder="Search by name or ingredient"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-4 p-2 border rounded"
+            />
+          </div>
+          <div className="flex flex-wrap justify-center gap-8">
+            {filteredRecipes.map((recipe) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ))}
+          </div>
         </div>
       </div>
     </Layout>
