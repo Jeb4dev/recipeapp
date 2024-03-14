@@ -44,13 +44,17 @@ export default function RecipePage(props) {
   function ImageContainer() {
     return recipe.image[currentImageIndex] ? (
       <div className="relative group w-screen">
-        <Image
-          key={recipe.image[currentImageIndex]?.responsiveImage?.src}
-          data={recipe.image[currentImageIndex]?.responsiveImage}
-          alt={recipe.image[currentImageIndex]?.responsiveImage?.alt}
-          objectFit={'cover'}
-          className="h-[420px]"
-        />
+        <div style={{ position: 'relative', width: '100%', height: 400 }}>
+          <Image
+            key={recipe.image[currentImageIndex]?.responsiveImage?.src}
+            data={recipe.image[currentImageIndex]?.responsiveImage}
+            alt={recipe.image[currentImageIndex]?.responsiveImage?.alt}
+            layout="fill"
+            objectFit="cover"
+            objectPosition="50% 50%"
+          />
+        </div>
+
         <button
           onClick={handlePreviousImage}
           className="absolute top-0 left-0 bg-red-500 text-white p-2 rounded-r opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
@@ -78,22 +82,24 @@ export default function RecipePage(props) {
           <div className="flex justify-center items-center w-full">
             <ImageContainer />
           </div>
-          <div className="flex items-center p-4">
-            {recipe.author?.image && (
-              <>
-                <div className={'max-h-8 max-w-8'}>
-                  <Image
-                    data={recipe.author.image?.responsiveImage}
-                    alt={recipe.author.image?.responsiveImage?.alt}
-                    className="rounded-full"
-                  />
-                </div>
-                <Link href={`/account?user=${recipe.author.id}`}>
-                  <p className="pl-2 text-red-600 hover:underline">{recipe.author.username}</p>
-                </Link>
-              </>
-            )}
-            <div className={'flex-grow flex justify-end items-center gap-2'}>
+          <div className="flex flex-col sm:flex-row sm:items-center p-4 gap-4">
+            <div className={'flex'}>
+              {recipe.author?.image && (
+                <>
+                  <div className={'max-h-8 max-w-8'}>
+                    <Image
+                      data={recipe.author.image?.responsiveImage}
+                      alt={recipe.author.image?.responsiveImage?.alt}
+                      className="rounded-full"
+                    />
+                  </div>
+                  <Link href={`/account?user=${recipe.author.id}`}>
+                    <p className="pl-2 text-red-600 hover:underline">{recipe.author.username}</p>
+                  </Link>
+                </>
+              )}
+            </div>
+            <div className={'flex-grow flex sm:justify-end items-center gap-2'}>
               <button onClick={handleLike} className="bg-red-500 text-white py-2 px-4 rounded">
                 <FontAwesomeIcon icon={faHeart} /> {likes}
               </button>
