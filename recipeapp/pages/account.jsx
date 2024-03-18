@@ -6,7 +6,6 @@ import { useState } from 'react';
 import RecipeCard from '../components/RecipeCard';
 
 const AccountPage = (props) => {
-
   const { data } = props;
   const user = data.user;
   const router = useRouter();
@@ -51,6 +50,7 @@ const AccountPage = (props) => {
   };
 
   const recipes = props.data.ownRecipes;
+  const userRecipes = recipes.filter((recipe) => recipe.author.id === user.id);
 
   // Tarkista, että recipes on määritelty ja se on taulukko
   if (!recipes || !Array.isArray(recipes)) {
@@ -117,14 +117,25 @@ const AccountPage = (props) => {
       <div className={'bg-red-50'}>
         <div className={'max-w-7xl mx-auto'}>
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
-          <div className="flex flex-wrap justify-between">
-            {recipes
+          <div className="flex flex-wrap justify-start gap-8">
+            {userRecipes
               .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => <RecipeCard key={index} recipe={recipe} />)
-              }
+              .map((recipe, index) => (
+                <RecipeCard key={index} recipe={recipe} />
+              ))}
           </div>
         </div>
-        
+
+        <div className={'max-w-7xl mx-auto'}>
+          <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
+          <div className="flex flex-wrap justify-start gap-8">
+            {user.favorites
+              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+              .map((recipe, index) => (
+                <RecipeCard key={index} recipe={recipe} />
+              ))}
+          </div>
+        </div>
       </div>
     </Layout>
   );
@@ -132,20 +143,14 @@ const AccountPage = (props) => {
 
 export default AccountPage;
 
-
 const ACCOUNT_QUERY = `
-  query UserById($id: ItemId) {
-    user(filter: {id: {eq: $id}}) {
-      name
-      username
-      email
-      id
-    }
-  }
-`;
-const OWN_RECIPES_QUERY = `
-  query RecipesByUser($Id: ItemId) {
-    allRecipes(filter: {id: {eq: $Id}}) {
+query UserById($id: ItemId) {
+  user(filter: {id: {eq: $id}}) {
+    name
+    username
+    email
+    id
+    favorites {
       id
       title
       likes
@@ -168,6 +173,36 @@ const OWN_RECIPES_QUERY = `
       }
     }
   }
+}
+`;
+const OWN_RECIPES_QUERY = `
+  query RecipesByUser($Id: ItemId) {
+    allRecipes(filter: {author: {eq: $Id}}) {
+      id
+      title
+      likes
+      description
+      _createdAt
+      image {
+        responsiveImage {
+          alt
+          aspectRatio
+          base64
+          bgColor
+          height
+          sizes
+          src
+          srcSet
+          title
+          webpSrcSet
+          width
+        }
+      }
+      author {
+        id
+      }
+    }
+  }
 `;
 
 export async function getServerSideProps(context) {
@@ -187,24 +222,24 @@ export async function getServerSideProps(context) {
   }
 
   const cookieString = decodeURIComponent(cookies);
-    session = JSON.parse(
-      cookieString
-        .split(';')
-        .find((c) => c.trim().startsWith('session'))
-        .split('=')[1],
-    );
+  session = JSON.parse(
+    cookieString
+      .split(';')
+      .find((c) => c.trim().startsWith('session'))
+      .split('=')[1],
+  );
 
-    if (user) {
-      data = await request({
-        query: ACCOUNT_QUERY,
-        variables: { id: user },
-      });
-    } else {
-      data = await request({
-        query: ACCOUNT_QUERY,
-        variables: { id: session.userId },
-      });
-    }
+  if (user) {
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: user },
+    });
+  } else {
+    data = await request({
+      query: ACCOUNT_QUERY,
+      variables: { id: session.userId },
+    });
+  }
 
   // Hakee käyttäjän omat reseptit käyttäen OWN_RECIPES_QUERY-kyselyä
   ownRecipesData = await request({
