@@ -50,9 +50,7 @@ const AccountPage = (props) => {
   };
 
   const recipes = props.data.ownRecipes;
-  const userRecipes = recipes.filter(recipe => recipe.author.id === user.id);
-
-
+  const userRecipes = recipes.filter((recipe) => recipe.author.id === user.id);
 
   // Tarkista, että recipes on määritelty ja se on taulukko
   if (!recipes || !Array.isArray(recipes)) {
@@ -119,8 +117,19 @@ const AccountPage = (props) => {
       <div className={'bg-red-50'}>
         <div className={'max-w-7xl mx-auto'}>
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
-          <div className="flex flex-wrap justify-between">
+          <div className="flex flex-wrap justify-start gap-8">
             {userRecipes
+              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+              .map((recipe, index) => (
+                <RecipeCard key={index} recipe={recipe} />
+              ))}
+          </div>
+        </div>
+
+        <div className={'max-w-7xl mx-auto'}>
+          <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
+          <div className="flex flex-wrap justify-start gap-8">
+            {user.favorites
               .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
               .map((recipe, index) => (
                 <RecipeCard key={index} recipe={recipe} />
@@ -135,14 +144,36 @@ const AccountPage = (props) => {
 export default AccountPage;
 
 const ACCOUNT_QUERY = `
-  query UserById($id: ItemId) {
-    user(filter: {id: {eq: $id}}) {
-      name
-      username
-      email
+query UserById($id: ItemId) {
+  user(filter: {id: {eq: $id}}) {
+    name
+    username
+    email
+    id
+    favorites {
       id
+      title
+      likes
+      description
+      _createdAt
+      image {
+        responsiveImage {
+          alt
+          aspectRatio
+          base64
+          bgColor
+          height
+          sizes
+          src
+          srcSet
+          title
+          webpSrcSet
+          width
+        }
+      }
     }
   }
+}
 `;
 const OWN_RECIPES_QUERY = `
   query RecipesByUser($Id: ItemId) {
