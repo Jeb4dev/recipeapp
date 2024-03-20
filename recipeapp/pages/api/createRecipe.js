@@ -2,12 +2,12 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { title, description, ingredients, instructions, serving, images, author, likes } = req.body;
+    const { title, description, ingredients, instructions, images, author} = req.body;
     
     console.log('Received request body:', req.body);
 
-    if (!title || !description || !ingredients || !instructions || !serving || !images || !author) {
-      throw new Error('Missing required fields in request body');
+    if (!title || !description || !ingredients || !instructions) {
+      throw new Error('Missing key fields');
     }
 
     // Create ingredients and instructions
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const createdInstructions = await createInstructions(instructions);
 
     // Create recipe with the created ingredients and instructions
-    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, serving, images, author);
+    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, images, author);
 
     res.status(201).json({ recipe: newRecipe });
   } catch (error) {
@@ -51,7 +51,7 @@ async function createIngredients(ingredients) {
         item_type: { type: 'item_type', id: 'KzctSfFlRaqAAJRJYezRzA' },
         name: ingredient.name,
         amount: ingredient.amount,
-        unit: ingredient.unit
+        unit: ingredient.unit,
       });
       console.log('Created ingredient:', newIngredient);
       return newIngredient;
@@ -71,7 +71,7 @@ async function createInstructions(instructions) {
     const createdInstructions = await Promise.all(instructions.map(async (instruction) => {
       const newInstruction = await client.items.create({
         item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
-        instruction: instruction.instruction
+        instruction: instruction
       });
       console.log('Created instruction:', newInstruction);
       return newInstruction;
@@ -84,7 +84,7 @@ async function createInstructions(instructions) {
   }
 }
 
-async function createRecipe(title, description, ingredients, instructions, serving, images, author) {
+async function createRecipe(title, description, ingredients, instructions, images, author) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create a new recipe');
   try {
@@ -94,9 +94,8 @@ async function createRecipe(title, description, ingredients, instructions, servi
       description: description,
       ingredients: ingredients.map((ingredient) => ({ item: ingredient.id })),
       instructions: instructions.map((instruction) => ({ item: instruction.id })),
-      serving: serving,
-      images: images.map((image) => ({ ...image })),
-      author: author,
+      images: images ? images.map((image) => ({ ...image })) : [],
+      author: author || null
     });
     console.log('Created a new recipe');
     return record;
