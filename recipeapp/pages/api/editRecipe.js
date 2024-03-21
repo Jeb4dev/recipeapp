@@ -5,16 +5,16 @@ export default async function handler(req, res) {
 
   if (method === 'PUT') {
     try {
-      const { recipeId, title, description, ingredients, instructions, serving, images, author } = body;
+      const { recipeId, title, description, ingredients, instructions, images, author, regonly } = body;
       const updatedRecipe = await updateRecipe(
         recipeId,
         title,
         description,
         ingredients,
         instructions,
-        serving,
         images,
         author,
+        regonly
       );
 
       res.status(200).json({ recipe: updatedRecipe });
@@ -55,7 +55,7 @@ function parseError(error) {
   return 'Something went wrong.';
 }
 
-async function updateRecipe(recipeId, title, description, ingredients, instructions, serving, images, author) {
+async function updateRecipe(recipeId, title, description, ingredients, instructions, serving, images, author, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   try {
     const updateData = {
@@ -65,7 +65,8 @@ async function updateRecipe(recipeId, title, description, ingredients, instructi
       instructions: instructions.map((instruction) => ({ ...instruction })),
       serving,
       images: images.map((image) => ({ ...image })),
-      author: author, // Add the author field
+      author: author,
+      regonly: regonly
     };
     return await client.items.update(recipeId, updateData);
   } catch (error) {
