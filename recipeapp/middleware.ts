@@ -6,15 +6,15 @@ export function middleware(request: NextRequest) {
 
   // Public routes that are available to everyone
   const publicRoutes = ['/', '/login', '/register', '/recipes', '/account'];
-  const limitedRoutes = ['/dashboard', '/newrecipe'];
+  const limitedRoutes = ['/dashboard', '/newrecipe', '/editrecipe'];
 
   // Check if the path is a recipe route (e.g., '/recipes/PtGNUBBWSRyMInlrGu9ruQ')
-  const isRecipeRoute = path.startsWith('/recipes/');
+  const isRecipeRoute = path.startsWith('/recipes/' ) || path.startsWith('/editrecipe/');
 
   // If the path is a public route or a recipe route, do not redirect
   if (publicRoutes.includes(path) || isRecipeRoute) {
     return;
-  }
+  }   
 
   // If the user is not authenticated and the requested path is '/dashboard' or '/newrecipe',
   // redirect the user to the '/login' page
