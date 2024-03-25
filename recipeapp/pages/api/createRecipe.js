@@ -2,7 +2,7 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { title, description, ingredients, instructions, images, author, regonly} = req.body;
+    const { title, description, ingredients, instructions, author, regonly} = req.body;
     
     console.log('Received request body:', req.body);
 
@@ -14,32 +14,40 @@ export default async function handler(req, res) {
     const createdIngredients = await createIngredients(ingredients);
     const createdInstructions = await createInstructions(instructions);
 
+    /* // Upload images
+    const uploadedImages = await Promise.all(
+      formData.images.map(async (image) => {
+        const upload = await uploadImage(image);
+        return upload.url; // Return only the URL of the uploaded image
+      })
+    );
+    
+    // Extract image URLs
+    const imageURLs = uploadedImages.map(upload => upload.url); */
+
     // Create recipe with the created ingredients and instructions
-    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, images, author, regonly);
+    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, author, regonly);
 
     res.status(201).json({ recipe: newRecipe });
   } catch (error) {
     console.error('Error in API route:', error);
-    const errorMessage = parseError(error);
     res.status(500).json({ error: errorMessage });
   }
 }
-
-async function parseError(error) {
-  console.log('Error:', error);
-  if (error.errors) {
-    return error.errors
-      .map((err) => {
-        const field = err.attributes.details.field;
-        const code = err.attributes.details.code;
-        if (code === 'VALIDATION_UNIQUE') {
-          return `${field.charAt(0).toUpperCase() + field.slice(1)} is already in use.`;
-        }
-        return 'Something went wrong.';
-      })
-      .join(' ');
+async function uploadImage(image) {
+  const client = buildClient({ apiToken: process.env.DATOCMS_API_TOKEN });
+  try {
+    const upload = await client.uploads.createFromBinary({
+      filename: image.name,
+      mimeType: image.type,
+      binaryContent: image,
+    });
+    console.log('Uploaded image:', upload);
+    return upload;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
   }
-  return 'Something went wrong.';
 }
 
 async function createIngredients(ingredients) {
@@ -84,17 +92,29 @@ async function createInstructions(instructions) {
   }
 }
 
-async function createRecipe(title, description, ingredients, instructions, images, author, regonly) {
+async function createRecipe(title, description, ingredients, instructions, author, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create a new recipe');
+  console.log(regonly)
   try {
+
+    const instructionIDs = instructions.map(instruction => {
+      // Assuming instruction is an object with an ID property
+      return instruction.id;
+    });
+
+    const ingredientIDs = ingredients.map(ingredient => {
+    // Assuming instruction is an object with an ID property
+    return ingredient.id;
+    });
+
     const record = await client.items.create({
       item_type: { type: 'item_type', id: 'InWodoopRq2APQiyEmYXGQ' },
       title: title,
       description: description,
-      ingredients: ingredients.map((ingredient) => ({ item: ingredient.id })),
-      instructions: instructions.map((instruction) => ({ item: instruction.id })),
-      images: images ? images.map((image) => ({ ...image })) : [],
+      ingredients: ingredientIDs,
+      instructions: instructionIDs,
+      //images: images,
       author: author,
       regonly: regonly
     });
