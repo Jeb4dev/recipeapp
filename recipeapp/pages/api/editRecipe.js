@@ -55,20 +55,57 @@ function parseError(error) {
   return 'Something went wrong.';
 }
 
-async function updateRecipe(recipeId, title, description, ingredients, instructions, serving, images, author, regonly) {
+async function updateRecipe(recipeId, title, description, ingredients, instructions, images, author, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   try {
-    const updateData = {
+    // Fetch the existing recipe data
+    const existingRecipe = await client.items.find(recipeId);
+
+    // Update the recipe data with the provided information
+    const updatedData = {
       title,
       description,
-      ingredients: ingredients.map((ingredient) => ({ ...ingredient })),
-      instructions: instructions.map((instruction) => ({ ...instruction })),
-      serving,
       images: images.map((image) => ({ ...image })),
-      author: author,
-      regonly: regonly
+      author,
+      regonly
     };
-    return await client.items.update(recipeId, updateData);
+
+    // Update ingredients if provided
+    if (ingredients) {
+      updatedData.ingredients = ingredients.map((ingredient) => {
+        const existingIngredient = existingRecipe.ingredients.find(
+          (existing) => existing.id === ingredient.id
+        );
+        // Merge the updated fields with existing data
+        return { ...existingIngredient, ...ingredient };
+      });
+    } else {
+      // If no new ingredients provided, keep existing ones
+      updatedData.ingredients = existingRecipe.ingredients;
+    }
+
+    // Update instructions if provided
+    if (instructions) {
+      updatedData.instructions = instructions.map((instruction) => {
+        const existingInstruction = existingRecipe.instructions.find(
+          (existing) => existing.id === instruction.id
+        );
+        // Merge the updated fields with existing data
+        return { ...existingInstruction, ...instruction };
+      });
+    } else {
+      // If no new instructions provided, keep existing ones
+      updatedData.instructions = existingRecipe.instructions;
+    }
+
+    // Remove ingredients that are no longer present in the UI
+    updatedData.ingredients = updatedData.ingredients.filter(ingredient => ingredients.some(newIngredient => newIngredient.id === ingredient.id));
+
+    // Remove instructions that are no longer present in the UI
+    updatedData.instructions = updatedData.instructions.filter(instruction => instructions.some(newInstruction => newInstruction.id === instruction.id));
+
+    // Update the recipe
+    return await client.items.update(recipeId, updatedData);
   } catch (error) {
     throw error;
   }

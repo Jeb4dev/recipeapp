@@ -5,9 +5,8 @@ import Layout from '../../components/layout';
 import Cookies from 'js-cookie';
 import { request } from '../../lib/datocms';
 
-export default function EditRecipePage() {
-  const [session, setSession] = useState(null);
-  const [recipe] = useState(null);
+export default function EditRecipePage({ recipeData }) {
+  const [recipe, setRecipe] = useState(null);
   const router = useRouter();
   const { id } = router.query;
   const [title, setTitle] = useState('');
@@ -22,13 +21,16 @@ export default function EditRecipePage() {
   const [regonly, setRegOnly] = useState(false);
 
   useEffect(() => {
-    const sessionCookie = Cookies.get('session');
-    if (sessionCookie) {
-      const decodedCookie = decodeURIComponent(sessionCookie);
-      const sessionData = JSON.parse(decodedCookie);
-      setSession(sessionData);
+    if (recipeData) {
+      setRecipe(recipeData.recipe);
+      setTitle(recipeData.recipe.title);
+      setDescription(recipeData.recipe.description);
+      setIngredients(recipeData.recipe.ingredients);
+      setInstructions(recipeData.recipe.instructions);
+      // setImages(recipeData.recipe.images); Ei toimi WIP
+      setRegOnly(recipeData.recipe.regonly);
     }
-  }, []);
+  }, [recipeData]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -57,15 +59,6 @@ export default function EditRecipePage() {
       console.error('Error updating recipe:', errorData.error);
     }
   };
-
-  if (!session) {
-    return <div>Loading...</div>;
-  }
-
-  if (!recipe) {
-    return <div>Loading recipe...</div>;
-  }
-
 
   const addIngredient = () => {
     if (ingredientName.trim() !== '' && ingredientAmount !== '' && ingredientUnit.trim() !== '') {
@@ -107,6 +100,9 @@ export default function EditRecipePage() {
     setRegOnly(!regonly);
   };
 
+  const handleDiscard = () => {
+    router.push('/');
+  };
 
   return (
     <Layout>
@@ -232,7 +228,7 @@ export default function EditRecipePage() {
           <ul className="list-disc pl-6">
             {instructions.map((instruction, index) => (
               <li key={index} className="mb-2">
-                {instruction} 
+                {instruction.instruction} 
                 <button onClick={() => removeInstruction(index)}>
                   <MdDelete /> {/* Using the delete icon */}
                 </button>
@@ -243,39 +239,39 @@ export default function EditRecipePage() {
 
         {/* Image upload */}
         <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2">
-          Images
-        </label>
-        <label htmlFor="imageUpload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-          Browse Image
-        </label>
-        <input
-          id="imageUpload"
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleImageUpload}
-        />
-  
-        {/* Display selected images */}
-        <div className="mt-2">
-          {images.map((image, index) => (
-            <div key={index} className="flex items-center mb-2">
-              <img
-                src={URL.createObjectURL(image)}
-                alt={`Uploaded Image ${index}`}
-                className="w-16 h-16 object-cover rounded mr-2"
-              />
-              <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                onClick={() => removeImage(index)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+          <label className="block text-gray-700 text-sm font-bold mb-2">
+            Images
+          </label>
+          <label htmlFor="imageUpload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
+            Browse Image
+          </label>
+          <input
+            id="imageUpload"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageUpload}
+          />
+
+          {/* Display selected images */}
+          <div className="mt-2">
+            {images.map((image, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <img
+                  src={URL.createObjectURL(image)}
+                  alt={`Uploaded Image ${index}`}
+                  className="w-16 h-16 object-cover rounded mr-2"
+                />
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => removeImage(index)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -291,42 +287,41 @@ export default function EditRecipePage() {
       
       {/* "Edit Recipe" and "Delete Recipe" buttons */}
       <div className="flex justify-between mt-4">
-              <button
-                onClick={handleEditRecipe}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                <FontAwesomeIcon icon={faEdit} className="mr-2" />
-                Edit Recipe
-              </button>
-              <button
-                onClick={handleDeleteRecipe}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                <FontAwesomeIcon icon={faTrash} className="mr-2" />
-                Delete Recipe
-              </button>
-            </div>
+        <button
+          onClick={handleSubmit}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Edit Recipe
+        </button>
+        <button
+          onClick={handleDiscard}
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        >
+          Discard changes
+        </button>
+      </div>
           </form>
         </div>
     </Layout>
   );
 }
 
-const PATHS_QUERY = `
-query MyQuery {
-  allRecipes {
-    id
-  }
-}
-`;
-
 export async function getStaticPaths() {
+  const PATHS_QUERY = `
+    query MyQuery {
+      allRecipes {
+        id
+      }
+    }
+  `;
+
   const recipeQuery = await request({
     query: PATHS_QUERY,
   });
 
-  let paths = [];
-  recipeQuery.allRecipes.map((p) => paths.push(`/editrecipe/${p.id}`));
+  const paths = recipeQuery.allRecipes.map((recipe) => ({
+    params: { id: recipe.id.toString() }, // Ensure the id is converted to a string
+  }));
 
   return {
     paths,
@@ -334,7 +329,98 @@ export async function getStaticPaths() {
   };
 }
 
-const POST_QUERY = `
+
+// Fetch recipe data based on the ID provided in the URL
+export const getStaticProps = async ({ params }) => {
+  const POST_QUERY = `
+    query MyQuery($id: ItemId) {
+      recipe(filter: {id: {eq: $id}}) {
+        id
+        image {
+          responsiveImage {
+            width
+            webpSrcSet
+            srcSet
+            title
+            src
+            sizes
+            height
+            bgColor
+            base64
+            aspectRatio
+            alt
+          }
+        }
+        likes
+        title
+        description
+        regonly
+        author {
+          username
+          id
+          image {
+            responsiveImage {
+              width
+              webpSrcSet
+              srcSet
+              title
+              src
+              sizes
+              height
+              bgColor
+              base64
+              aspectRatio
+              alt
+            }
+          }
+        }
+        ingredients {
+          name
+          amount
+          unit
+        }
+        instructions {
+          instruction
+        }
+      }
+    }
+  `;
+  const data = await request({
+    query: POST_QUERY,
+    variables: {
+      id: params.id,
+    },
+  });
+
+  return {
+    props: {
+      recipeData: data,
+    },
+  };
+};
+
+
+/* export async function getServerSideProps(context) {
+  const { id } = context.query;
+  const cookies = context.req.headers.cookie;
+
+  const cookieString = decodeURIComponent(cookies);
+  const sessionCookie = cookieString
+    .split(';')
+    .find((c) => c.trim().startsWith('session'));
+
+  if (!sessionCookie) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  const session = JSON.parse(sessionCookie.split('=')[1]);
+
+  const POST_QUERY = `
 query MyQuery($id: ItemId) {
   recipe(filter: {id: {eq: $id}}) {
     id
@@ -394,133 +480,30 @@ query MyQuery($id: ItemId) {
   }
 }
 `;
-export const getStaticProps = async ({ params }) => {
+
   const data = await request({
     query: POST_QUERY,
     variables: {
-      id: params.id,
+      id,
     },
   });
 
+  const { recipe } = data;
+
+  if (!recipe || (session.username !== recipe.author.username && !session.isAdmin)) {
+    // Redirect to home page if the user is neither the author nor an admin
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    };
+  }
+
   return {
-    props: { data },
+    props: {
+      recipeData: data, // Adjust the key as per your query response structure
+      session,
+    },
   };
-};
-
-
-// export async function getServerSideProps(context) {
-//   const { id } = context.query;
-//   const cookies = context.req.headers.cookie;
-
-//   if (!cookies) {
-//     return {
-//       redirect: {
-//         destination: '/login',
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   const cookieString = decodeURIComponent(cookies);
-//   const sessionCookie = cookieString
-//     .split(';')
-//     .find((c) => c.trim().startsWith('session'));
-
-//   if (!sessionCookie) {
-//     return {
-//       redirect: {
-//         destination: '/login',
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   const session = JSON.parse(sessionCookie.split('=')[1]);
-
-//   const POST_QUERY = `
-// query MyQuery($id: ItemId) {
-//   recipe(filter: {id: {eq: $id}}) {
-//     id
-//     image {
-//       responsiveImage {
-//         width
-//         webpSrcSet
-//         srcSet
-//         title
-//         src
-//         sizes
-//         height
-//         bgColor
-//         base64
-//         aspectRatio
-//         alt
-//       }
-//     }
-//     likes
-//     serving
-//     title
-//     description
-//     regonly
-//     author {
-//       username
-//       id
-//       image {
-//       responsiveImage {
-//         width
-//         webpSrcSet
-//         srcSet
-//         title
-//         src
-//         sizes
-//         height
-//         bgColor
-//         base64
-//         aspectRatio
-//         alt
-//       }
-//     }
-//   }
-//   ingredients {
-//       amount
-//       name
-//       unit
-//   }
-//   instructions {
-//       instruction
-//     }
-//   }
-//   user {
-//     username
-//     image {
-//       id
-//     }
-//   }
-// }
-// `;
-
-//   const data = await request({
-//     query: POST_QUERY,
-//     variables: {
-//       id,
-//     },
-//   });
-
-//   const { recipe } = data;
-
-//   if (!recipe || (session.username !== recipe.author.username && !session.isAdmin)) {
-//     // Redirect to home page if the user is neither the author nor an admin
-//     return {
-//       redirect: {
-//         destination: '/',
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   return {
-//     props: {
-//       recipeData: data.recipe, // Adjust the key as per your query response structure
-//       session,
-//     },
-//   };
-// }
+} */
