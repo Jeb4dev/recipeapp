@@ -7,17 +7,17 @@ const HomePage = (props) => {
   const recipes = props.data.allRecipes;
   return (
     <Layout>
-      <div className={'bg-red-50'}>
-        <div className={'max-w-7xl mx-auto'}>
+      <div className="bg-red-50">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Tykätyimmät reseptit</h1>
-          <div className="flex flex-wrap justify-between">
+          <div className="flex flex-wrap justify-around">
             {recipes
               .sort((a, b) => b.likes - a.likes)
               .map((recipe, index) => <RecipeCard key={index} recipe={recipe} />)
               .slice(0, 3)}
           </div>
         </div>
-        <div className={'max-w-7xl mx-auto'}>
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Uusimmat reseptit</h1>
           <div className="flex flex-wrap justify-around">
             {recipes
