@@ -114,8 +114,8 @@ const AccountPage = (props) => {
         </button>
       </div>
 
-      <div className={'bg-red-50'}>
-        <div className={'max-w-7xl mx-auto'}>
+      <div className="bg-red-50">
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
             {userRecipes
@@ -126,7 +126,7 @@ const AccountPage = (props) => {
           </div>
         </div>
 
-        <div className={'max-w-7xl mx-auto'}>
+        <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
             {user.favorites
