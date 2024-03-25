@@ -34,6 +34,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: errorMessage });
   }
 }
+
 async function uploadImage(image) {
   const client = buildClient({ apiToken: process.env.DATOCMS_API_TOKEN });
   try {
@@ -75,6 +76,7 @@ async function createIngredients(ingredients) {
 async function createInstructions(instructions) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create instructions');
+  console.log(instructions)
   try {
     const createdInstructions = await Promise.all(instructions.map(async (instruction) => {
       const newInstruction = await client.items.create({

@@ -6,9 +6,9 @@ import Cookies from 'js-cookie';
 import { request } from '../../lib/datocms';
 
 export default function EditRecipePage({ recipeData }) {
-  const [recipe, setRecipe] = useState(null);
   const router = useRouter();
   const { id } = router.query;
+  const [recipe, setRecipe] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [ingredients, setIngredients] = useState([]);
@@ -19,6 +19,7 @@ export default function EditRecipePage({ recipeData }) {
   const [instructionText, setInstructionText] = useState('');
   const [images, setImages] = useState([]);
   const [regonly, setRegOnly] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (recipeData) {
@@ -34,17 +35,47 @@ export default function EditRecipePage({ recipeData }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Prepare data to send to the API route for updating the recipe
+
+    // Check if required fields are filled
+  if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
+    setError('Missing required fields');
+    return;
+  }
+
+  // Check if ingredient fields are filled
+  const invalidIngredients = ingredients.filter(
+    (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit
+  );
+  if (invalidIngredients.length > 0) {
+    setError('Invalid ingredient fields:', invalidIngredients);
+    return;
+  }
+
+  // Check if instruction fields are filled
+  const invalidInstructions = instructions.filter((instruction) => !instruction);
+  if (invalidInstructions.length > 0) {
+    setError('Invalid instruction fields:', invalidInstructions);
+    return;
+  }
+
+  const { id } = recipeData.recipe;
+
+    // Prepare the data to send to the API route
     const data = {
-      title: recipe.title,
-      description: recipe.description,
-      ingredients: recipe.ingredients,
-      instructions: recipe.instructions,
-      images: recipe.images,
-      regonly: recipe.regonly,
+      id: id,
+      title,
+      description,
+      ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
+      instructions: instructions.filter(instruction => instruction),
+      // images: images.map(image => ({ localPath: URL.createObjectURL(image), filename: image.name })),
+      regonly: regonly,
+      action: 'edit'
     };
+
+    console.log(data)
+
     // Call the API route for updating the recipe
-    const response = await fetch(`/api/editrecipe/${id}`, {
+    const response = await fetch(`/api/editRecipe/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -53,14 +84,24 @@ export default function EditRecipePage({ recipeData }) {
     });
 
     if (response.ok) {
-      router.push(`/recipes/${id}`);
+      router.push(`/`);
     } else {
       const errorData = await response.json();
       console.error('Error updating recipe:', errorData.error);
     }
   };
 
+  const handleCloseModal = () => {
+    setError('');
+  };
+
   const addIngredient = () => {
+
+    if (!ingredientName || isNaN(ingredientAmount) || !ingredientUnit) {
+      setError('Invalid ingredient data');
+      return;
+    }
+
     if (ingredientName.trim() !== '' && ingredientAmount !== '' && ingredientUnit.trim() !== '') {
       setIngredients([...ingredients, { name: ingredientName, amount: parseFloat(ingredientAmount), unit: ingredientUnit }]);
       setIngredientName(''); // Reset ingredient name field after adding
@@ -75,8 +116,14 @@ export default function EditRecipePage({ recipeData }) {
   };
 
   const addInstruction = () => {
+
+    if (!instructionText) {
+      setError('Invalid instruction data');
+      return;
+    }
+
     if (instructionText.trim() !== '') {
-      setInstructions([...instructions, instructionText]);
+      setInstructions([...instructions, { instruction: instructionText }]);
       setInstructionText('');
     }
   };
@@ -302,6 +349,43 @@ export default function EditRecipePage({ recipeData }) {
       </div>
           </form>
         </div>
+
+    {/* Other JSX elements */}
+    {error && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                      Error
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onClick={handleCloseModal} type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </Layout>
   );
 }
