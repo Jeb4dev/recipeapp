@@ -119,22 +119,30 @@ const AccountPage = (props) => {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
-            {userRecipes
-              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} />
-              ))}
+          {userRecipes.length > 0 ? (
+            userRecipes
+                .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+                .map((recipe, index) => (
+                  <RecipeCard key={index} recipe={recipe} />
+                ))
+            ) : (
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei omia reseptejä</p></div>
+            )}
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
-            {user.favorites
-              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} />
-              ))}
+            {user.favorites.length > 0 ? (
+            user.favorites
+            .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+            .map((recipe, index) => (
+              <RecipeCard key={index} recipe={recipe} />
+                ))
+            ) : (
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei tykättyjä reseptejä</p></div>
+            )}
           </div>
         </div>
       </div>
