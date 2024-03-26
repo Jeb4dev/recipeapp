@@ -4,6 +4,8 @@ import { MdDelete } from 'react-icons/md';
 import Layout from '../../components/layout';
 import Cookies from 'js-cookie';
 import { request } from '../../lib/datocms';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export default function EditRecipePage({ recipeData }) {
   const [session, setSession] = useState(null);
@@ -47,8 +49,6 @@ export default function EditRecipePage({ recipeData }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    console.log('hi')
 
     if (session.userId !== recipeData.recipe.author.id ) {
       if (session.userId !== 'Wzxstkc8R6iQyPLfZc517Q') {
@@ -185,6 +185,42 @@ export default function EditRecipePage({ recipeData }) {
 
   const handleDiscard = () => {
     router.push('/');
+  };
+
+  const handleDelete = async () => {
+
+    if (session.userId !== recipeData.recipe.author.id ) {
+      if (session.userId !== 'Wzxstkc8R6iQyPLfZc517Q') {
+        setError('Unauthorized!');
+        return;
+      }
+
+    }
+
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      try {
+        const response = await fetch('/api/editRecipe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: recipe.id,
+            action: 'delete',
+          }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          router.push(`/`);
+          console.log(data.message);
+        } else {
+          // Handle deletion failure
+          console.error(data.message);
+        }
+      } catch (error) {
+        console.error('Error deleting recipe:', error);
+      }
+    }
   };
 
   return (
@@ -377,20 +413,28 @@ export default function EditRecipePage({ recipeData }) {
       </div>
       
       {/* "Edit Recipe" and "Delete Recipe" buttons */}
-      <div className="flex justify-between mt-4">
-        <button
-          onClick={handleSubmit}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Edit Recipe
-        </button>
-        <button
-          onClick={handleDiscard}
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        >
-          Discard changes
-        </button>
+      <div className="flex justify-between p-4">
+        <div className="flex gap-2">
+          <button
+          className="bg-blue-500 text-white py-2 px-4 rounded"
+          onClick={handleSubmit}>
+            <FontAwesomeIcon icon={faEdit} /> Edit
+          </button>
+          <button
+            className="bg-gray-500 text-white py-2 px-4 rounded"
+            onClick={handleDiscard}>
+            <FontAwesomeIcon icon={faTimes} /> Discard changes
+          </button>
+        </div>
+        <div>
+          <button
+            className="bg-red-500 text-white py-2 px-4 rounded"
+            onClick={handleDelete}>
+            <FontAwesomeIcon icon={faTrash} /> DELETE
+          </button>
+        </div>
       </div>
+
           </form>
         </div>
 
@@ -526,112 +570,3 @@ export const getStaticProps = async ({ params }) => {
     },
   };
 };
-
-
-/* export async function getServerSideProps(context) {
-  const { id } = context.query;
-  const cookies = context.req.headers.cookie;
-
-  const cookieString = decodeURIComponent(cookies);
-  const sessionCookie = cookieString
-    .split(';')
-    .find((c) => c.trim().startsWith('session'));
-
-  if (!sessionCookie) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-
-  const session = JSON.parse(sessionCookie.split('=')[1]);
-
-  const POST_QUERY = `
-query MyQuery($id: ItemId) {
-  recipe(filter: {id: {eq: $id}}) {
-    id
-    image {
-      responsiveImage {
-        width
-        webpSrcSet
-        srcSet
-        title
-        src
-        sizes
-        height
-        bgColor
-        base64
-        aspectRatio
-        alt
-      }
-    }
-    likes
-    serving
-    title
-    description
-    regonly
-    author {
-      username
-      id
-      image {
-      responsiveImage {
-        width
-        webpSrcSet
-        srcSet
-        title
-        src
-        sizes
-        height
-        bgColor
-        base64
-        aspectRatio
-        alt
-      }
-    }
-  }
-  ingredients {
-      amount
-      name
-      unit
-  }
-  instructions {
-      instruction
-    }
-  }
-  user {
-    username
-    image {
-      id
-    }
-  }
-}
-`;
-
-  const data = await request({
-    query: POST_QUERY,
-    variables: {
-      id,
-    },
-  });
-
-  const { recipe } = data;
-
-  if (!recipe || (session.username !== recipe.author.username && !session.isAdmin)) {
-    // Redirect to home page if the user is neither the author nor an admin
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      recipeData: data, // Adjust the key as per your query response structure
-      session,
-    },
-  };
-} */
