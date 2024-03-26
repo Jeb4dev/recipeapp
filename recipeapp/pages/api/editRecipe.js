@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         instructions,
         images,
         author,
-        regonly
+        regonly,
       );
 
       res.status(200).json({ recipe: updatedRecipe });
@@ -66,7 +66,7 @@ async function updateRecipe(recipeId, title, description, ingredients, instructi
       serving,
       images: images.map((image) => ({ ...image })),
       author: author,
-      regonly: regonly
+      regonly: regonly,
     };
     return await client.items.update(recipeId, updateData);
   } catch (error) {
