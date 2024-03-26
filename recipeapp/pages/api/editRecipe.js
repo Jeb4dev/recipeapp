@@ -4,8 +4,6 @@ export default async function handler(req, res) {
   try {
     const { id, title, description, ingredients, instructions, regonly, action } = req.body;
 
-    console.log('Received request body:', req.body);
-
     if (!id) {
       throw new Error('Recipe ID is required');
     }
@@ -28,7 +26,6 @@ export default async function handler(req, res) {
 
 async function editRecipe(id, title, description, ingredients, instructions, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
-  console.log('Starting to edit recipe:', id);
   try {
     // Update recipe with the provided data
     const updatedRecipe = await client.items.update(id, {
@@ -44,7 +41,6 @@ async function editRecipe(id, title, description, ingredients, instructions, reg
         await client.items.update(instructionId, {
           instruction: instructions[index].instruction,
         });
-        console.log('Updated instruction:', instructionId);
       } else {
         console.warn('Instruction not found for index:', index);
       }
@@ -59,7 +55,6 @@ for (const ingredientId of updatedRecipe.ingredients) {
       amount: ingredients[index].amount,
       unit: ingredients[index].unit,
     });
-    console.log('Updated ingredient:', ingredientId);
   } else {
     console.warn('Ingredient not found for index:', index);
   }
@@ -72,7 +67,6 @@ for (const ingredientId of updatedRecipe.ingredients) {
 
     if (numNewInstructions > 0) {
       const newInstructions = instructions.slice(numExistingInstructions);
-      console.log(newInstructions);
       const formattedInstructions = newInstructions.map(instructionObj => instructionObj.instruction);
       const createdInstructions = await createInstructions(formattedInstructions);
       const newInstructionIds = createdInstructions.map(instruction => instruction.id);
@@ -82,14 +76,11 @@ for (const ingredientId of updatedRecipe.ingredients) {
         instructions: [...existingInstructionIds, ...newInstructionIds],
       });
       
-      console.log('Added new instructions:', newInstructionIds);
-      console.log('Updated recipe with new instructions:', updatedRecipeWithNewInstructions);
     } else if (numNewInstructions < 0) {
       // Remove excess instructions from the recipe
       const instructionsToRemove = existingInstructionIds.slice(instructions.length);
       for (const instructionId of instructionsToRemove) {
         await client.items.destroy(instructionId);
-        console.log('Removed instruction:', instructionId);
       }
       
       // Update the recipe to remove the excess instructions
@@ -97,8 +88,6 @@ for (const ingredientId of updatedRecipe.ingredients) {
         instructions: existingInstructionIds.slice(0, instructions.length),
       });
       
-      console.log('Removed excess instructions');
-      console.log('Updated recipe without excess instructions:', updatedRecipeWithoutExcessInstructions);
     }
 
     // Add new ingredients if there are more ingredients in the 'ingredients' array
@@ -108,7 +97,6 @@ for (const ingredientId of updatedRecipe.ingredients) {
 
     if (numNewIngredients > 0) {
       const newIngredients = ingredients.slice(numExistingIngredients);
-      console.log(newIngredients);
       const formattedNewIngredients = newIngredients.map(ingredientObj => ({
         name: ingredientObj.name,
         amount: ingredientObj.amount,
@@ -122,27 +110,19 @@ for (const ingredientId of updatedRecipe.ingredients) {
         ingredients: [...existingIngredientIds, ...newIngredientIds],
       });
       
-      console.log('Added new ingredients:', newIngredientIds);
-      console.log('Updated recipe with new ingredients:', updatedRecipeWithNewIngredients);
     } else if (numNewIngredients < 0) {
       // Remove excess ingredients from the recipe
       const ingredientsToRemove = existingIngredientIds.slice(ingredients.length);
       for (const ingredientId of ingredientsToRemove) {
         await client.items.destroy(ingredientId);
-        console.log('Removed ingredient:', ingredientId);
       }
       
       // Update the recipe to remove the excess ingredients
       const updatedRecipeWithoutExcessIngredients = await client.items.update(id, {
         ingredients: existingIngredientIds.slice(0, ingredients.length),
       });
-      
-      console.log('Removed excess ingredients');
-      console.log('Updated recipe without excess ingredients:', updatedRecipeWithoutExcessIngredients);
     }
 
-
-    console.log('Edited recipe:', updatedRecipe);
     return { success: true, message: 'Recipe updated successfully' };
   } catch (error) {
     console.error('Error editing recipe:', error);
@@ -152,18 +132,14 @@ for (const ingredientId of updatedRecipe.ingredients) {
 
 async function createInstructions(instructions) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
-  console.log('Starting to create instructions');
-  console.log(instructions)
   try {
     const createdInstructions = await Promise.all(instructions.map(async (instruction) => {
       const newInstruction = await client.items.create({
         item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
         instruction: instruction
       });
-      console.log('Created instruction:', newInstruction);
       return newInstruction;
     }));
-    console.log('Finished creating instructions');
     return createdInstructions;
   } catch (error) {
     console.log('Error creating instructions');
@@ -173,7 +149,6 @@ async function createInstructions(instructions) {
 
 async function createIngredients(ingredients) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
-  console.log('Starting to create ingredients');
   try {
     const createdIngredients = await Promise.all(ingredients.map(async (ingredient) => {
       const newIngredient = await client.items.create({
@@ -182,10 +157,8 @@ async function createIngredients(ingredients) {
         amount: ingredient.amount,
         unit: ingredient.unit,
       });
-      console.log('Created ingredient:', newIngredient);
       return newIngredient;
     }));
-    console.log('Finished creating ingredients');
     return createdIngredients;
   } catch (error) {
     console.log('Error creating ingredients');
@@ -195,11 +168,9 @@ async function createIngredients(ingredients) {
 
 async function deleteRecipe(id) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
-  console.log('Starting to delete recipe:', id);
   try {
     // Delete the recipe with the provided ID
     await client.items.destroy(id);
-    console.log('Deleted recipe with ID:', id);
     return { success: true, message: 'Recipe deleted successfully' };
   } catch (error) {
     console.error('Error deleting recipe:', error);

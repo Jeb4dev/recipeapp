@@ -94,8 +94,6 @@ export default function EditRecipePage({ recipeData }) {
       action: 'edit'
     };
 
-    console.log(data)
-
     // Call the API route for updating the recipe
     const response = await fetch(`/api/editRecipe/`, {
       method: 'PUT',
@@ -212,9 +210,7 @@ export default function EditRecipePage({ recipeData }) {
         const data = await response.json();
         if (data.success) {
           router.push(`/`);
-          console.log(data.message);
         } else {
-          // Handle deletion failure
           console.error(data.message);
         }
       } catch (error) {

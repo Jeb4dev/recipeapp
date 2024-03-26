@@ -51,8 +51,6 @@ export default function RecipePage(props) {
 
   useEffect(() => {
 
-    console.log(session)
-
     if (session && session.favorites?.includes(recipe.id)) {
       setIsFavorited(true);
     } else {
