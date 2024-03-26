@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Layout from '../components/Layout';
 import Link from 'next/link';
 import {router} from "next/client";
+import Layout from "../components/layout";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -19,7 +19,7 @@ export default function ForgotPassword() {
     if (response.status === 200) {
       console.log('Response status is 200, navigating to success page...');
       setError(null);
-      await router.push('/success');
+      await router.push('/reset');
     } else {
       const data = await response.json();
       setError(data.error);

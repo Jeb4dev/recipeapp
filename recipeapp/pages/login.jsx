@@ -102,7 +102,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <div className="mt-2 text-center">
-            <Link href="/recipeapp/pages/forgot-password">
+            <Link href="/forgot-password">
               <p className="font-medium text-indigo-600 hover:text-indigo-500">Forgot Password? Reset now</p>
             </Link>
           </div>
