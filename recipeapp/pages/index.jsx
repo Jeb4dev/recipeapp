@@ -7,6 +7,7 @@ const HomePage = (props) => {
   const recipes = props.data.allRecipes;
   return (
     <Layout>
+      <title>Etusivu</title>
       <div className="bg-red-50">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Tykätyimmät reseptit</h1>

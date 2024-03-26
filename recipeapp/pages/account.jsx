@@ -61,6 +61,7 @@ const AccountPage = (props) => {
 
   return (
     <Layout>
+      <title>Account</title>
       <div className="p-4 mx-auto max-w-3xl">
         <h1 className="text-2xl font-bold mb-4">Account Page</h1>
         <form onSubmit={handleEdit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">

@@ -16,6 +16,7 @@ export default function RecipesPage({ data }) {
 
   return (
     <Layout>
+      <title>Reseptit</title>
       <div className="py-10 mx-auto max-w-[90%]">
         <div>
           <div className="px-10">
