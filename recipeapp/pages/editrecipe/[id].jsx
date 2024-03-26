@@ -48,9 +48,14 @@ export default function EditRecipePage({ recipeData }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (session.userId !== recipeData.recipe.author.id || session.userId === 'Wzxstkc8R6iQyPLfZc517Q') {
-      setError('Unauthorized!');
-      return;
+    console.log('hi')
+
+    if (session.userId !== recipeData.recipe.author.id ) {
+      if (session.userId !== 'Wzxstkc8R6iQyPLfZc517Q') {
+        setError('Unauthorized!');
+        return;
+      }
+
     }
 
     // Check if required fields are filled

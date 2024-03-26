@@ -4,7 +4,7 @@ import { Image } from 'react-datocms';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faHeart, faPrint, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faHeart, faPrint, faStar, faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import Cookies from 'js-cookie';
 
@@ -144,6 +144,14 @@ export default function RecipePage(props) {
     );
   }
 
+  if (!session && recipe.regonly) {
+    return (
+      <Layout>
+        <div>This recipe is only available for registered users.</div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className={'bg-red-50 min-h-screen'}>
@@ -167,6 +175,11 @@ export default function RecipePage(props) {
               </>
             )}
             <div className={'flex-grow flex justify-end items-center gap-2'}>
+            <Link href={`/editrecipe/${recipe.id}`}>
+              <button className="bg-blue-500 text-white py-2 px-4 rounded" disabled={(session?.userId !== recipe.author.id) && (session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q')}>
+                <FontAwesomeIcon icon={faEdit} /> Edit Recipe
+              </button>
+            </Link>
             <button onClick={handleLike} title="Tykkää" className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}>
               <FontAwesomeIcon icon={faStar} /> {likes}
               </button>
@@ -277,6 +290,7 @@ query MyQuery($id: ItemId) {
     serving
     title
     description
+    regonly
     author {
       username
       id
