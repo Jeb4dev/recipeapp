@@ -95,7 +95,29 @@ export default function RecipePage(props) {
       setLikes(likes + 1);
     }
     setIsLiked(!isLiked); // Vaihtaa tilan vastakkaiseksi
-  };
+    
+    /* Ei toimi
+    // Prepare the data object with the new likes count
+    const data = {
+      likes: newLikes,
+      // ... include other recipe data that needs to be updated
+    };
+
+     // Call the API route for updating the recipe's likes
+  const response = await fetch(`/api/editrecipe/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (response.ok) {
+    console.log('Likes updated successfully!');
+  } else {
+    console.error('Failed to update likes.');
+  }*/
+};
 
   const handleNextImage = () => {
     setCurrentImageIndex((currentImageIndex + 1) % recipe.image.length);
