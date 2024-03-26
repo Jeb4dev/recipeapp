@@ -182,6 +182,7 @@ export default function NewRecipePage() {
 
   return (
     <Layout>
+      <title>Uusi resepti</title>
       <div className="container mx-auto px-4">
         <h1 className="text-2xl font-bold mb-4 mt-4">Create a New Recipe</h1>
         <form onSubmit={handleSubmit}>

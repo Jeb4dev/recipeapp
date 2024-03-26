@@ -50,7 +50,7 @@ const AccountPage = (props) => {
   };
 
   const recipes = props.data.ownRecipes;
-  const userRecipes = recipes.filter((recipe) => recipe.author.id === user.id);
+  const userRecipes = recipes.filter((recipe) => recipe.author && recipe.author.id === user.id);
 
   // Tarkista, että recipes on määritelty ja se on taulukko
   if (!recipes || !Array.isArray(recipes)) {
@@ -61,6 +61,7 @@ const AccountPage = (props) => {
 
   return (
     <Layout>
+      <title>Account</title>
       <div className="p-4 mx-auto max-w-3xl">
         <h1 className="text-2xl font-bold mb-4">Account Page</h1>
         <form onSubmit={handleEdit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
@@ -118,22 +119,30 @@ const AccountPage = (props) => {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
-            {userRecipes
-              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} />
-              ))}
+          {userRecipes.length > 0 ? (
+            userRecipes
+                .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+                .map((recipe, index) => (
+                  <RecipeCard key={index} recipe={recipe} />
+                ))
+            ) : (
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei omia reseptejä</p></div>
+            )}
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
           <div className="flex flex-wrap justify-start gap-8">
-            {user.favorites
-              .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-              .map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} />
-              ))}
+            {user.favorites.length > 0 ? (
+            user.favorites
+            .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+            .map((recipe, index) => (
+              <RecipeCard key={index} recipe={recipe} />
+                ))
+            ) : (
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei tykättyjä reseptejä</p></div>
+            )}
           </div>
         </div>
       </div>
