@@ -132,7 +132,7 @@ const AccountPage = (props) => {
         </div>
 
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
+          <h1 className="text-2xl font-bold my-4">Suosikit</h1>
           <div className="flex flex-wrap justify-start gap-8">
             {user.favorites.length > 0 ? (
             user.favorites
@@ -141,7 +141,7 @@ const AccountPage = (props) => {
               <RecipeCard key={index} recipe={recipe} />
                 ))
             ) : (
-              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>No favorites</p></div>
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei suosikkireseptejä</p></div>
             )}
           </div>
         </div>
