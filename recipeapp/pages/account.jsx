@@ -50,7 +50,7 @@ const AccountPage = (props) => {
   };
 
   const recipes = props.data.ownRecipes;
-  const userRecipes = recipes.filter((recipe) => recipe.author.id === user.id);
+  const userRecipes = recipes.filter((recipe) => recipe.author && recipe.author.id === user.id);
 
   // Tarkista, että recipes on määritelty ja se on taulukko
   if (!recipes || !Array.isArray(recipes)) {
