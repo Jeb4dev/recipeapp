@@ -2,7 +2,7 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { title, description, ingredients, instructions, images, author} = req.body;
+    const { title, description, ingredients, instructions, images, author, regonly} = req.body;
     
     console.log('Received request body:', req.body);
 
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     const createdInstructions = await createInstructions(instructions);
 
     // Create recipe with the created ingredients and instructions
-    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, images, author);
+    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, images, author, regonly);
 
     res.status(201).json({ recipe: newRecipe });
   } catch (error) {
@@ -84,7 +84,7 @@ async function createInstructions(instructions) {
   }
 }
 
-async function createRecipe(title, description, ingredients, instructions, images, author) {
+async function createRecipe(title, description, ingredients, instructions, images, author, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create a new recipe');
   try {
@@ -95,7 +95,8 @@ async function createRecipe(title, description, ingredients, instructions, image
       ingredients: ingredients.map((ingredient) => ({ item: ingredient.id })),
       instructions: instructions.map((instruction) => ({ item: instruction.id })),
       images: images ? images.map((image) => ({ ...image })) : [],
-      author: author || null
+      author: author,
+      regonly: regonly
     });
     console.log('Created a new recipe');
     return record;

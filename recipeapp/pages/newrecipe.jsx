@@ -16,6 +16,7 @@ export default function NewRecipePage() {
   const [ingredientUnit, setIngredientUnit] = useState('');
   const [instructionText, setInstructionText] = useState('');
   const [images, setImages] = useState([]);
+  const [regonly, setRegOnly] = useState(false);
   const [author, setAuthor] = useState('');
 
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function NewRecipePage() {
       ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
       instructions: instructions.filter(instruction => instruction),
       images,
+      regonly,
       author
     };
 
@@ -90,6 +92,16 @@ export default function NewRecipePage() {
   const handleImageUpload = (event) => {
   const selectedFile = event.target.files[0];
   setImages([...images, selectedFile]);
+};
+
+const removeImage = (index) => {
+  const updatedImages = [...images];
+  updatedImages.splice(index, 1);
+  setImages(updatedImages);
+};
+
+const handleRegOnlyToggle = () => {
+  setRegOnly(!regonly);
 };
 
   return (
@@ -259,6 +271,18 @@ export default function NewRecipePage() {
       </div>
     ))}
   </div>
+</div>
+
+<div className="mb-4">
+  <label className="block text-gray-700 text-sm font-bold mb-2">
+    <input
+      type="checkbox"
+      checked={regonly}
+      onChange={handleRegOnlyToggle}
+      className="mr-2"
+    />
+    Registered users only
+  </label>
 </div>
   
   <button

@@ -28,7 +28,7 @@ export default function RecipesPage({ data }) {
               className="mb-4 p-2 border rounded"
             />
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
+          <div className="flex flex-wrap justify-around gap-4 max-w-full">
             {filteredRecipes.map((recipe) => (
               <RecipeCard key={recipe.id} recipe={recipe} />
             ))}
