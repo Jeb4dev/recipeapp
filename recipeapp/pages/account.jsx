@@ -141,7 +141,7 @@ const AccountPage = (props) => {
               <RecipeCard key={index} recipe={recipe} />
                 ))
             ) : (
-              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei tykättyjä reseptejä</p></div>
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>No favorites</p></div>
             )}
           </div>
         </div>

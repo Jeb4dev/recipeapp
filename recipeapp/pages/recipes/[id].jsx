@@ -34,55 +34,7 @@ export default function RecipePage(props) {
       
     }
   }, []);
-
-  const toggleFavorite = () => {
-    if (!isFavorited){
-      console.log("Tähän tulisi lisäys suosikkeihin");
-      //addFavorite();
-    } else {
-      console.log("Tähän tulisi poisto suosikeista");
-    }
-    setIsFavorited(!isFavorited);
-  };
-  //Ei toimi WIP
-  /*const addFavorite = async () => {
-
-    const userId = session.userId; // Oletetaan, että käyttäjän ID on saatavilla
-    const favoriteRecipeId = recipe.id; // ID reseptistä, joka lisätään suosikkeihin
-
-    try {
-      const res = await fetch('/api/user', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.DATOCMS_API_TOKEN}`, // Varmista, että lisäät API-tokenin
-          },
-          body: JSON.stringify({
-            id: userId,
-            type: 'item',
-            attributes: {
-            favorites: [...session.favorites, favoriteRecipeId], // Lisää uusi suosikki nykyiseen listaan
-          },
-        }),
-      });
-    } catch (error) {
-      console.log("Ei aiempia suosikkeja, lisätään ensimmäinen")
-      const res = await fetch('/api/user', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.DATOCMS_API_TOKEN}`, // Varmista, että lisäät API-tokenin
-        },
-        body: JSON.stringify({
-          id: userId,
-          type: 'item',
-          attributes: {
-          favorites: favoriteRecipeId, // Lisää uusi suosikki nykyiseen listaan
-        },
-      }),
-    });
-    }
-  }; */
+  
   const incrementServingSize = () => {
     setServingSize(servingSize + 1);
   };
@@ -96,6 +48,45 @@ export default function RecipePage(props) {
   useEffect(() => {
     setCurrentUrl(window.location.href);
   }, []);
+
+  useEffect(() => {
+
+    console.log(session)
+
+    if (session && session.favorites?.includes(recipe.id)) {
+      setIsFavorited(true);
+    } else {
+      setIsFavorited(false);
+    }
+  }, [session, recipe.id]);
+
+  const toggleFavorite = async () => {
+
+    if (!session) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/favorite', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: session.userId,
+          recipeId: recipe.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle favorite');
+      }
+
+      setIsFavorited(!isFavorited); // Update favorite status
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
   const handleLike = () => {
     if (isLiked) {
@@ -183,7 +174,12 @@ export default function RecipePage(props) {
             <button onClick={handleLike} title="Tykkää" className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}>
               <FontAwesomeIcon icon={faStar} /> {likes}
               </button>
-              <button onClick={toggleFavorite} title="Lisää suosikkeihin" className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800': 'bg-red-500 text-white'}`}>
+              <button
+                onClick={toggleFavorite}
+                title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+                className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800': 'bg-red-500 text-white'}`}
+                disabled={!session}
+              >
                 <FontAwesomeIcon icon={faHeart} />
               </button>
               <button onClick={() => window.print()} title="Tulosta" className="bg-red-500 text-white py-2 px-4 rounded">
