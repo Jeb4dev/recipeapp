@@ -16,6 +16,7 @@ export default function NewRecipePage() {
   const [ingredientUnit, setIngredientUnit] = useState('');
   const [instructionText, setInstructionText] = useState('');
   const [images, setImages] = useState([]);
+  const [imageInput, setImageInput] = useState('');
   const [regonly, setRegOnly] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,63 +32,81 @@ export default function NewRecipePage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     // Set the author from session if sessionData.username exists
     const authorId = session.userId;
-
+  
     // Check if required fields are filled
-  if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
-    setError('Missing required fields');
-    return;
-  }
-
-  // Check if ingredient fields are filled
-  const invalidIngredients = ingredients.filter(
-    (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit
-  );
-  if (invalidIngredients.length > 0) {
-    setError('Invalid ingredient fields:', invalidIngredients);
-    return;
-  }
-
-  // Check if instruction fields are filled
-  const invalidInstructions = instructions.filter((instruction) => !instruction);
-  if (invalidInstructions.length > 0) {
-    setError('Invalid instruction fields:', invalidInstructions);
-    return;
-  }
-
-    // Prepare the data to send to the API route
-    const data = {
-      title,
-      description,
-      ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
-      instructions: instructions.filter(instruction => instruction),
-      // images: images.map(image => ({ localPath: URL.createObjectURL(image), filename: image.name })),
-      regonly: regonly,
-      author: authorId
-    };
-
-    console.log(data)
-
-    
-    
-    // Call the API route for creating a new recipe
-    const response = await fetch('/api/createRecipe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      const responseData = await response.json();
-      // Redirect to the newly created recipe page
-      router.push(`/`);
-    } else {
-      const errorData = await response.json();
-      setError('Error creating recipe:', errorData.error);
+    if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
+      setError('Missing required fields');
+      return;
+    }
+  
+    // Check if ingredient fields are filled
+    const invalidIngredients = ingredients.filter(
+      (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit
+    );
+    if (invalidIngredients.length > 0) {
+      setError('Invalid ingredient fields:', invalidIngredients);
+      return;
+    }
+  
+    // Check if instruction fields are filled
+    const invalidInstructions = instructions.filter((instruction) => !instruction);
+    if (invalidInstructions.length > 0) {
+      setError('Invalid instruction fields:', invalidInstructions);
+      return;
+    }
+  
+    try {
+      const imageUrls = [];
+      for (const imageUrl of images) {
+        const response = await fetch('/api/uploadImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imageUrl }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Error uploading image to DatoCMS');
+        }
+  
+        const imageData = await response.json();
+        imageUrls.push(imageData);
+      }
+  
+      // Prepare the data to send to the API route
+      const data = {
+        title,
+        description,
+        ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
+        instructions: instructions.filter(instruction => instruction),
+        images: imageUrls,
+        regonly: regonly,
+        author: authorId
+      };
+  
+      // Call the API route for creating a new recipe
+      const createRecipeResponse = await fetch('/api/createRecipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (createRecipeResponse.ok) {
+        const responseData = await createRecipeResponse.json();
+        // Redirect to the newly created recipe page
+        router.push(`/`);
+      } else {
+        const errorData = await createRecipeResponse.json();
+        setError('Error creating recipe:', errorData.error);
+      }
+    } catch (error) {
+      setError('Error:', error.message);
     }
   };
 
@@ -132,15 +151,29 @@ export default function NewRecipePage() {
     setInstructions(instructions.filter((_, i) => i !== index));
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    setImages([...images, ...files]);
+  const handleAddImage = () => {
+    const isValidImageUrl = (url) => {
+      return /^https?:\/\/.*\.(jpg|jpeg|png)$/i.test(url);
+    };
+  
+    if (imageInput.trim() === '') {
+      setError('Image URL cannot be empty');
+      return;
+    }
+  
+    if (!isValidImageUrl(imageInput.trim())) {
+      setError('Invalid image URL. URL must start with "http://" or "https://" and end with ".jpg", ".jpeg", or ".png".');
+      return;
+    }
+  
+    setImages([...images, imageInput.trim()]);
+    setImageInput('');
   };
 
   const removeImage = (index) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
   };
 
   const handleRegOnlyToggle = () => {
@@ -280,63 +313,70 @@ export default function NewRecipePage() {
             </ul>
           </div>
 
-        {/* Image upload */}
+          {/* Image upload */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               Images
             </label>
-            <label htmlFor="imageUpload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-              Browse Image
-            </label>
-            <input
-              id="imageUpload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageUpload}
-              multiple  // Allow selecting multiple images
-            />
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Paste Image URL"
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                className="border border-gray-400 rounded w-full py-2 px-3 mr-2 focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button" // Change the type to button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                onClick={handleAddImage}
+              >
+                Add Image
+              </button>
+            </div>
+          </div>
   
-  {/* Display selected images */}
-  <div className="mt-2">
-    {images.map((image, index) => (
-      <div key={index} className="flex items-center mb-2">
-        <img
-          src={URL.createObjectURL(image)}
-          alt={`Uploaded Image ${index}`}
-          className="w-16 h-16 object-cover rounded mr-2"
-        />
-        <button
-          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-          onClick={() => removeImage(index)}
-        >
-          Remove
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+          {/* Display selected images */}
+          <div className="mt-2">
+            {images.map((image, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <img
+                  src={image}
+                  alt={`Uploaded Image ${index}`}
+                  className="w-16 h-16 object-cover rounded mr-2"
+                />
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => removeImage(index)}
+                >
+                  Remove
+                </button>
+              </div>
+            )
+            )
+            }
+          </div>
 
-<div className="mb-4">
-  <label className="block text-gray-700 text-sm font-bold mb-2">
-    <input
-      type="checkbox"
-      checked={regonly}
-      onChange={handleRegOnlyToggle}
-      className="mr-2"
-    />
-    Registered users only
-  </label>
-</div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              <input
+                type="checkbox"
+                checked={regonly}
+                onChange={handleRegOnlyToggle}
+                className="mr-2"
+              />
+              Registered users only
+            </label>
+          </div>
   
-  <button
-    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
-    type="submit"
-  >
-    Create Recipe
-  </button>
-      </form>
-    </div>
+          <button
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
+            type="submit"
+          >
+            Create Recipe
+          </button>
+              </form>
+            </div>
     
     {/* Other JSX elements */}
     {error && (

@@ -2,7 +2,7 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { title, description, ingredients, instructions, author, regonly} = req.body;
+    const { title, description, ingredients, instructions, author, regonly, images} = req.body;
     
     console.log('Received request body:', req.body);
 
@@ -14,17 +14,6 @@ export default async function handler(req, res) {
     const createdIngredients = await createIngredients(ingredients);
     const createdInstructions = await createInstructions(instructions);
 
-    /* // Upload images
-    const uploadedImages = await Promise.all(
-      formData.images.map(async (image) => {
-        const upload = await uploadImage(image);
-        return upload.url; // Return only the URL of the uploaded image
-      })
-    );
-    
-    // Extract image URLs
-    const imageURLs = uploadedImages.map(upload => upload.url); */
-
     // Create recipe with the created ingredients and instructions
     const newRecipe = await createRecipe(
       title,
@@ -33,28 +22,13 @@ export default async function handler(req, res) {
       createdInstructions,
       author,
       regonly,
+      images,
     );
 
     res.status(201).json({ recipe: newRecipe });
   } catch (error) {
     console.error('Error in API route:', error);
     res.status(500).json({ error: errorMessage });
-  }
-}
-
-async function uploadImage(image) {
-  const client = buildClient({ apiToken: process.env.DATOCMS_API_TOKEN });
-  try {
-    const upload = await client.uploads.createFromBinary({
-      filename: image.name,
-      mimeType: image.type,
-      binaryContent: image,
-    });
-    console.log('Uploaded image:', upload);
-    return upload;
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    throw error;
   }
 }
 
@@ -105,21 +79,23 @@ async function createInstructions(instructions) {
   }
 }
 
-async function createRecipe(title, description, ingredients, instructions, author, regonly) {
+async function createRecipe(title, description, ingredients, instructions, author, regonly, images) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create a new recipe');
-  console.log(regonly)
+
   try {
 
     const instructionIDs = instructions.map(instruction => {
-      // Assuming instruction is an object with an ID property
       return instruction.id;
     });
 
     const ingredientIDs = ingredients.map(ingredient => {
-    // Assuming instruction is an object with an ID property
     return ingredient.id;
     });
+
+    const imageArray = images.map(image => ({
+      upload_id: image.upload.id,
+    }));
 
     const record = await client.items.create({
       item_type: { type: 'item_type', id: 'InWodoopRq2APQiyEmYXGQ' },
@@ -127,9 +103,9 @@ async function createRecipe(title, description, ingredients, instructions, autho
       description: description,
       ingredients: ingredientIDs,
       instructions: instructionIDs,
-      //images: images,
       author: author,
       regonly: regonly,
+      image: imageArray,
     });
     console.log('Created a new recipe');
     return record;
