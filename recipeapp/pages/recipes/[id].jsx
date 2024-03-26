@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faHeart, faPrint, faStar } from '@fortawesome/free-solid-svg-icons';
 
+import Cookies from 'js-cookie';
+
 export default function RecipePage(props) {
 
-  
-
   const recipe = props.data.recipe;
-  const [likes, setLikes] = useState(recipe.likes);
+  
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentUrl, setCurrentUrl] = useState('');
 
@@ -20,38 +20,69 @@ export default function RecipePage(props) {
 
 
   const [isFavorited, setIsFavorited] = useState(false);
+  const [likes, setLikes] = useState(recipe.likes);
+  const [isLiked, setIsLiked] = useState(false);
 
   const [session, setSession] = useState(null);
 
+  useEffect(() => {
+    const sessionCookie = Cookies.get('session');
+    if (sessionCookie) {
+      const decodedCookie = decodeURIComponent(sessionCookie);
+      const sessionData = JSON.parse(decodedCookie);
+      setSession(sessionData);
+      
+    }
+  }, []);
+
   const toggleFavorite = () => {
-    
-    setIsFavorited(!isFavorited);
-    if (isFavorited){
+    if (!isFavorited){
       console.log("Tähän tulisi lisäys suosikkeihin");
       //addFavorite();
     } else {
       console.log("Tähän tulisi poisto suosikeista");
     }
+    setIsFavorited(!isFavorited);
   };
   //Ei toimi WIP
   /*const addFavorite = async () => {
-    const response = await fetch('/api/user', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(recipe.id),
+
+    const userId = session.userId; // Oletetaan, että käyttäjän ID on saatavilla
+    const favoriteRecipeId = recipe.id; // ID reseptistä, joka lisätään suosikkeihin
+
+    try {
+      const res = await fetch('/api/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.DATOCMS_API_TOKEN}`, // Varmista, että lisäät API-tokenin
+          },
+          body: JSON.stringify({
+            id: userId,
+            type: 'item',
+            attributes: {
+            favorites: [...session.favorites, favoriteRecipeId], // Lisää uusi suosikki nykyiseen listaan
+          },
+        }),
+      });
+    } catch (error) {
+      console.log("Ei aiempia suosikkeja, lisätään ensimmäinen")
+      const res = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.DATOCMS_API_TOKEN}`, // Varmista, että lisäät API-tokenin
+        },
+        body: JSON.stringify({
+          id: userId,
+          type: 'item',
+          attributes: {
+          favorites: favoriteRecipeId, // Lisää uusi suosikki nykyiseen listaan
+        },
+      }),
     });
-
-    if (response.ok) {
-      const responseData = await response.json();
-      console.log("Suosikin lisääminen onnistui");
-    } else {
-      const errorData = await response.json();
-      console.log(errorData);
     }
-  };*/
-
+  }; */
   const incrementServingSize = () => {
     setServingSize(servingSize + 1);
   };
@@ -67,7 +98,12 @@ export default function RecipePage(props) {
   }, []);
 
   const handleLike = () => {
-    setLikes(likes + 1);
+    if (isLiked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+    }
+    setIsLiked(!isLiked); // Vaihtaa tilan vastakkaiseksi
   };
 
   const handleNextImage = () => {
@@ -131,10 +167,10 @@ export default function RecipePage(props) {
               </>
             )}
             <div className={'flex-grow flex justify-end items-center gap-2'}>
-            <button onClick={handleLike} title="Tykkää" className="bg-red-500 text-white py-2 px-4 rounded">
+            <button onClick={handleLike} title="Tykkää" className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}>
               <FontAwesomeIcon icon={faStar} /> {likes}
               </button>
-              <button onClick={toggleFavorite} title="Lisää suosikkeihin" className={`py-2 px-4 rounded ${isFavorited ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+              <button onClick={toggleFavorite} title="Lisää suosikkeihin" className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800': 'bg-red-500 text-white'}`}>
                 <FontAwesomeIcon icon={faHeart} />
               </button>
               <button onClick={() => window.print()} title="Tulosta" className="bg-red-500 text-white py-2 px-4 rounded">
