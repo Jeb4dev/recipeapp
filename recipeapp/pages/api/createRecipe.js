@@ -26,7 +26,14 @@ export default async function handler(req, res) {
     const imageURLs = uploadedImages.map(upload => upload.url); */
 
     // Create recipe with the created ingredients and instructions
-    const newRecipe = await createRecipe(title, description, createdIngredients, createdInstructions, author, regonly);
+    const newRecipe = await createRecipe(
+      title,
+      description,
+      createdIngredients,
+      createdInstructions,
+      author,
+      regonly,
+    );
 
     res.status(201).json({ recipe: newRecipe });
   } catch (error) {
@@ -55,16 +62,18 @@ async function createIngredients(ingredients) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   console.log('Starting to create ingredients');
   try {
-    const createdIngredients = await Promise.all(ingredients.map(async (ingredient) => {
-      const newIngredient = await client.items.create({
-        item_type: { type: 'item_type', id: 'KzctSfFlRaqAAJRJYezRzA' },
-        name: ingredient.name,
-        amount: ingredient.amount,
-        unit: ingredient.unit,
-      });
-      console.log('Created ingredient:', newIngredient);
-      return newIngredient;
-    }));
+    const createdIngredients = await Promise.all(
+      ingredients.map(async (ingredient) => {
+        const newIngredient = await client.items.create({
+          item_type: { type: 'item_type', id: 'KzctSfFlRaqAAJRJYezRzA' },
+          name: ingredient.name,
+          amount: ingredient.amount,
+          unit: ingredient.unit,
+        });
+        console.log('Created ingredient:', newIngredient);
+        return newIngredient;
+      }),
+    );
     console.log('Finished creating ingredients');
     return createdIngredients;
   } catch (error) {
@@ -78,14 +87,16 @@ async function createInstructions(instructions) {
   console.log('Starting to create instructions');
   console.log(instructions)
   try {
-    const createdInstructions = await Promise.all(instructions.map(async (instruction) => {
-      const newInstruction = await client.items.create({
-        item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
-        instruction: instruction
-      });
-      console.log('Created instruction:', newInstruction);
-      return newInstruction;
-    }));
+    const createdInstructions = await Promise.all(
+      instructions.map(async (instruction) => {
+        const newInstruction = await client.items.create({
+          item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
+          instruction: instruction,
+        });
+        console.log('Created instruction:', newInstruction);
+        return newInstruction;
+      }),
+    );
     console.log('Finished creating instructions');
     return createdInstructions;
   } catch (error) {
@@ -118,7 +129,7 @@ async function createRecipe(title, description, ingredients, instructions, autho
       instructions: instructionIDs,
       //images: images,
       author: author,
-      regonly: regonly
+      regonly: regonly,
     });
     console.log('Created a new recipe');
     return record;

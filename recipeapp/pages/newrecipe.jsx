@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { MdDelete } from 'react-icons/md';
 import Layout from '../components/layout';
@@ -28,7 +28,6 @@ export default function NewRecipePage() {
       
     }
   }, []);
-
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -102,14 +101,16 @@ export default function NewRecipePage() {
       return;
     }
     if (ingredientName.trim() !== '' && ingredientAmount !== '' && ingredientUnit.trim() !== '') {
-      setIngredients([...ingredients, { name: ingredientName, amount: parseFloat(ingredientAmount), unit: ingredientUnit }]);
+      setIngredients([
+        ...ingredients,
+        { name: ingredientName, amount: parseFloat(ingredientAmount), unit: ingredientUnit },
+      ]);
       setIngredientName(''); // Reset ingredient name field after adding
       setIngredientAmount(0); // Reset ingredient amount field after adding
       setIngredientUnit(''); // Reset ingredient unit field after adding
     }
   };
 
-  
   const removeIngredient = (index) => {
     setIngredients(ingredients.filter((_, i) => i !== index));
   };
@@ -141,143 +142,148 @@ export default function NewRecipePage() {
     updatedImages.splice(index, 1);
     setImages(updatedImages);
   };
+  const removeImage = (index) => {
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
+  };
 
-const handleRegOnlyToggle = () => {
-  setRegOnly(!regonly);
-};
+  const handleRegOnlyToggle = () => {
+    setRegOnly(!regonly);
+  };
 
   return (
     <Layout>
-    <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold mb-4 mt-4">Create a New Recipe</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-            Title
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-  
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-            Description
-          </label>
-          <textarea
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-
-        {/* New ingredient input fields */}
-        <div className="mb-4 flex items-bottom">
-          <div className="mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientName">
-              Ingredient Name
+      <div className="container mx-auto px-4">
+        <h1 className="text-2xl font-bold mb-4 mt-4">Create a New Recipe</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+              Title
             </label>
             <input
-              className="shadow appearance-none border rounded w-32 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="ingredientName"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="title"
               type="text"
-              value={ingredientName}
-              onChange={(e) => setIngredientName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
-          <div className="mr-2">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientAmount">
-              Amount
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+              Description
             </label>
-            <input
-              className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="ingredientAmount"
-              type="number"
-              step="0.1"
-              value={Math.max(0, parseFloat(ingredientAmount))}
-              onChange={(e) => {
-                const newValue = parseFloat(e.target.value);
-                if (!isNaN(newValue) && newValue >= 0) {
-                  setIngredientAmount(newValue);
-                }
-              }}
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+
+          {/* New ingredient input fields */}
+          <div className="mb-4 flex items-bottom">
+            <div className="mr-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientName">
+                Ingredient Name
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-32 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="ingredientName"
+                type="text"
+                value={ingredientName}
+                onChange={(e) => setIngredientName(e.target.value)}
+              />
+            </div>
+            <div className="mr-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientAmount">
+                Amount
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="ingredientAmount"
+                type="number"
+                step="0.1"
+                value={Math.max(0, parseFloat(ingredientAmount))}
+                onChange={(e) => {
+                  const newValue = parseFloat(e.target.value);
+                  if (!isNaN(newValue) && newValue >= 0) {
+                    setIngredientAmount(newValue);
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientUnit">
+                Unit
+              </label>
+              <input
+                className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="ingredientUnit"
+                type="text"
+                value={ingredientUnit}
+                onChange={(e) => setIngredientUnit(e.target.value)}
+              />
+            </div>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={addIngredient}
+              style={{ marginLeft: '8px' }}
+            >
+              Add Ingredient
+            </button>
+          </div>
+
+          {/* Display ingredients */}
           <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientUnit">
-              Unit
+            <ul className="list-disc pl-6">
+              {ingredients.map((ingredient, index) => (
+                <li key={index} className="mb-2">
+                  {ingredient.name}, {ingredient.amount} {ingredient.unit}
+                  <button onClick={() => removeIngredient(index)}>
+                    <MdDelete /> {/* Using the delete icon */}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* New instruction input field */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="instruction">
+              Instruction
             </label>
             <input
-              className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="ingredientUnit"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="instruction"
               type="text"
-              value={ingredientUnit}
-              onChange={(e) => setIngredientUnit(e.target.value)}
+              value={instructionText}
+              onChange={(e) => setInstructionText(e.target.value)}
             />
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={addInstruction}
+            >
+              Add Instruction
+            </button>
           </div>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={addIngredient}
-            style={{ marginLeft: '8px' }}
-          >
-            Add Ingredient
-          </button>
-        </div>
 
-        {/* Display ingredients */}
-        <div>
-          <ul className="list-disc pl-6">
-            {ingredients.map((ingredient, index) => (
-              <li key={index} className="mb-2">
-                {ingredient.name}, {ingredient.amount} {ingredient.unit} 
-                <button onClick={() => removeIngredient(index)}>
-                  <MdDelete /> {/* Using the delete icon */}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* New instruction input field */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="instruction">
-            Instruction
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="instruction"
-            type="text"
-            value={instructionText}
-            onChange={(e) => setInstructionText(e.target.value)}
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={addInstruction}
-          >
-            Add Instruction
-          </button>
-        </div>
-
-        {/* Display instructions */}
-        <div>
-          <ul className="list-disc pl-6">
-            {instructions.map((instruction, index) => (
-              <li key={index} className="mb-2">
-                {instruction} 
-                <button onClick={() => removeInstruction(index)}>
-                  <MdDelete /> {/* Using the delete icon */}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+          {/* Display instructions */}
+          <div>
+            <ul className="list-disc pl-6">
+              {instructions.map((instruction, index) => (
+                <li key={index} className="mb-2">
+                  {instruction}
+                  <button onClick={() => removeInstruction(index)}>
+                    <MdDelete /> {/* Using the delete icon */}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
 
         {/* Image upload */}
           <div className="mb-4">
