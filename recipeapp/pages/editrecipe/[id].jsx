@@ -6,6 +6,7 @@ import Cookies from 'js-cookie';
 import { request } from '../../lib/datocms';
 
 export default function EditRecipePage({ recipeData }) {
+  const [session, setSession] = useState(null);
   const router = useRouter();
   const { id } = router.query;
   const [recipe, setRecipe] = useState('');
@@ -18,8 +19,19 @@ export default function EditRecipePage({ recipeData }) {
   const [ingredientUnit, setIngredientUnit] = useState('');
   const [instructionText, setInstructionText] = useState('');
   const [images, setImages] = useState([]);
+  const [imageInput, setImageInput] = useState('');
   const [regonly, setRegOnly] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const sessionCookie = Cookies.get('session');
+    if (sessionCookie) {
+      const decodedCookie = decodeURIComponent(sessionCookie);
+      const sessionData = JSON.parse(decodedCookie);
+      setSession(sessionData);
+      
+    }
+  }, []);
 
   useEffect(() => {
     if (recipeData) {
@@ -35,6 +47,11 @@ export default function EditRecipePage({ recipeData }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (session.userId !== recipeData.recipe.author.id || session.userId === 'Wzxstkc8R6iQyPLfZc517Q') {
+      setError('Unauthorized!');
+      return;
+    }
 
     // Check if required fields are filled
   if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
@@ -132,15 +149,29 @@ export default function EditRecipePage({ recipeData }) {
     setInstructions(instructions.filter((_, i) => i !== index));
   };
 
-  const handleImageUpload = (event) => {
-    const selectedFile = event.target.files[0];
-    setImages([...images, selectedFile]);
-};
+  const handleAddImage = () => {
+    const isValidImageUrl = (url) => {
+      return /^https?:\/\/.*\.(jpg|jpeg|png)$/i.test(url);
+    };
+  
+    if (imageInput.trim() === '') {
+      setError('Image URL cannot be empty');
+      return;
+    }
+  
+    if (!isValidImageUrl(imageInput.trim())) {
+      setError('Invalid image URL. URL must start with "http://" or "https://" and end with ".jpg", ".jpeg", or ".png".');
+      return;
+    }
+  
+    setImages([...images, imageInput.trim()]);
+    setImageInput('');
+  };
 
   const removeImage = (index) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
   };
 
   const handleRegOnlyToggle = () => {
@@ -286,26 +317,33 @@ export default function EditRecipePage({ recipeData }) {
 
         {/* Image upload */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">
-            Images
-          </label>
-          <label htmlFor="imageUpload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer">
-            Browse Image
-          </label>
-          <input
-            id="imageUpload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageUpload}
-          />
-
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Images
+            </label>
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Paste Image URL"
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                className="border border-gray-400 rounded w-full py-2 px-3 mr-2 focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button" // Change the type to button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                onClick={handleAddImage}
+              >
+                Add Image
+              </button>
+            </div>
+          </div>
+  
           {/* Display selected images */}
           <div className="mt-2">
             {images.map((image, index) => (
               <div key={index} className="flex items-center mb-2">
                 <img
-                  src={URL.createObjectURL(image)}
+                  src={image}
                   alt={`Uploaded Image ${index}`}
                   className="w-16 h-16 object-cover rounded mr-2"
                 />
@@ -316,9 +354,10 @@ export default function EditRecipePage({ recipeData }) {
                   Remove
                 </button>
               </div>
-            ))}
+            )
+            )
+            }
           </div>
-        </div>
 
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">
