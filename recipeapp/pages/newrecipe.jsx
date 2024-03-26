@@ -142,11 +142,6 @@ export default function NewRecipePage() {
     updatedImages.splice(index, 1);
     setImages(updatedImages);
   };
-  const removeImage = (index) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
-  };
 
   const handleRegOnlyToggle = () => {
     setRegOnly(!regonly);
