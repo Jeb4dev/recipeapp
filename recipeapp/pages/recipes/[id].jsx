@@ -11,6 +11,9 @@ import Cookies from 'js-cookie';
 export default function RecipePage(props) {
 
   const recipe = props.data.recipe;
+
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([]);
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentUrl, setCurrentUrl] = useState('');
@@ -33,6 +36,9 @@ export default function RecipePage(props) {
       setSession(sessionData);
       
     }
+
+    setComments(recipe.comments);
+
   }, []);
   
   const incrementServingSize = () => {
@@ -85,6 +91,39 @@ export default function RecipePage(props) {
       console.error('Error toggling favorite:', error);
     }
   };
+
+  // Function to handle adding a new comment
+  const handleAddComment = async () => {
+
+    if (!session) return;
+
+    if (newComment.trim() === '') return;
+
+    const formattedComment = `${session.username}: ${newComment}`;
+
+    try {
+      const response = await fetch('/api/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: recipe.id, comment: formattedComment, action: 'edit' }),
+      });
+
+      if (response.ok) {
+        const newCommentObj = { comment: formattedComment, timestamp: new Date().toISOString() };
+        setNewComment('');
+        const updatedComments = [...comments, newCommentObj];
+        setComments(updatedComments); // Update comments with new comment added
+      } else {
+        throw new Error('Failed to add comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+
+  };
+
 
   const handleLike = () => {
     if (isLiked) {
@@ -255,6 +294,34 @@ export default function RecipePage(props) {
               </ol>
             </div>
           </div>
+
+          {/* Comments Section */}
+          {/* Display comments */}
+          <div className="mt-8 p-4 bg-white rounded-md shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+            <ul>
+              {comments.map((comment, index) => (
+                <li key={index} className="mb-4">
+                  <p className="text-gray-800">{comment.comment}</p>
+                  <p className="text-gray-500 text-sm">{comment.timestamp}</p>
+                </li>
+              ))}
+            </ul>
+            {/* Input field for new comment */}
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add your comment..."
+              className="w-full mt-4 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleAddComment}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              Add Comment
+            </button>
+          </div>
+          
         </div>
       </div>
     </Layout>
@@ -333,6 +400,10 @@ query MyQuery($id: ItemId) {
   }
   instructions {
       instruction
+    }
+  comments {
+    comment
+    timestamp
     }
   }
   user {
