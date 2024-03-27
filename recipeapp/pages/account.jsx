@@ -56,7 +56,7 @@ const AccountPage = (props) => {
   if (!recipes || !Array.isArray(recipes)) {
     console.error('recipes ei ole taulukko tai se ei ole määritelty');
     // Reseptejä ei löytynyt WIP
-    return <div>Reseptejä ei löytynyt.</div>;
+    return <div>No recipes found</div>;
   }
 
   return (
@@ -117,7 +117,7 @@ const AccountPage = (props) => {
 
       <div className="bg-red-50">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold my-4">Omat reseptit</h1>
+          <h1 className="text-2xl font-bold my-4">Own recipes</h1>
           <div className="flex flex-wrap justify-start gap-8">
           {userRecipes.length > 0 ? (
             userRecipes
@@ -126,13 +126,13 @@ const AccountPage = (props) => {
                   <RecipeCard key={index} recipe={recipe} />
                 ))
             ) : (
-              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>Ei omia reseptejä</p></div>
+              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>No own recipes</p></div>
             )}
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold my-4">Tykätyt reseptit</h1>
+          <h1 className="text-2xl font-bold my-4">Favorites</h1>
           <div className="flex flex-wrap justify-start gap-8">
             {user.favorites.length > 0 ? (
             user.favorites
