@@ -26,9 +26,6 @@ export default function RecipesPage({ data }) {
 
   const handleRandomRecipe = () => {
     router.push(`/recipes/${randomRecipeId}`);
-    const nextRandomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
-    setRandomRecipeId(nextRandomRecipe.id);
-    router.prefetch(`/recipes/${nextRandomRecipe.id}`);
   };
 
   return (
