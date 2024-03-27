@@ -1,12 +1,12 @@
-import Layout from '../../components/layout';
-import { request } from '../../lib/datocms';
-import { Image } from 'react-datocms';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faEnvelope, faHeart, faPrint, faStar } from '@fortawesome/free-solid-svg-icons';
-
+import { Image } from 'react-datocms';
 import Cookies from 'js-cookie';
+
+import { request } from '../../lib/datocms';
+import Layout from '../../components/layout';
 
 export default function RecipePage(props) {
   const recipe = props.data.recipe;
