@@ -1,24 +1,34 @@
-import { useState } from 'react';
-import Layout from '../components/layout';
-import { request } from '../lib/datocms';
-import RecipeCard from '../components/RecipeCard';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { request } from '../lib/datocms';
+import Layout from '../components/layout';
+import RecipeCard from '../components/RecipeCard';
 
 export default function RecipesPage({ data }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [randomRecipeId, setRandomRecipeId] = useState(null);
   const recipes = data.allRecipes;
+  const router = useRouter();
 
   const filteredRecipes = recipes.filter(
-    (recipe) =>
-      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (recipe.ingredients &&
-        recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))),
+      (recipe) =>
+          recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (recipe.ingredients &&
+              recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(searchTerm.toLowerCase()))),
   );
 
-  const router = useRouter();
-  const handleRandomRecipe = () => {
+  // Preload the next URL after the site has loaded
+  useEffect(() => {
     const randomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
-    router.push(`/recipes/${randomRecipe.id}`);
+    setRandomRecipeId(randomRecipe.id);
+    router.prefetch(`/recipes/${randomRecipe.id}`);
+  }, [recipes, router]);
+
+  const handleRandomRecipe = () => {
+    router.push(`/recipes/${randomRecipeId}`);
+    const nextRandomRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+    setRandomRecipeId(nextRandomRecipe.id);
+    router.prefetch(`/recipes/${nextRandomRecipe.id}`);
   };
 
   return (
