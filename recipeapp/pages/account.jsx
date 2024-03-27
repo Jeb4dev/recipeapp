@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { request } from '../lib/datocms';
 
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 import RecipeCard from '../components/RecipeCard';
 
 const AccountPage = (props) => {

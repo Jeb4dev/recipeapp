@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 
 export default function RegisterPage() {
   const router = useRouter();

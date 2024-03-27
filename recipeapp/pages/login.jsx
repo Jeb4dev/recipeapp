@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -103,7 +103,7 @@ export default function LoginPage() {
             </Link>
           </div>
           <div className="mt-2 text-center">
-            <Link href="/forgot-password">
+            <Link href="/recipeapp/pages/forgotPassword">
               <p className="font-medium text-indigo-600 hover:text-indigo-500">Forgot Password? Reset now</p>
             </Link>
           </div>
