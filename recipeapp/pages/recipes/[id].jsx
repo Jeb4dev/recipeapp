@@ -4,17 +4,43 @@ import { Image } from 'react-datocms';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faHeart, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faHeart, faPrint, faStar, faEdit } from '@fortawesome/free-solid-svg-icons';
+
+import Cookies from 'js-cookie';
 
 export default function RecipePage(props) {
+
   const recipe = props.data.recipe;
-  const [likes, setLikes] = useState(recipe.likes);
+
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState([]);
+  
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentUrl, setCurrentUrl] = useState('');
 
   const initialServingSize = recipe.serving || 1;
   const [servingSize, setServingSize] = useState(initialServingSize);
 
+
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [likes, setLikes] = useState(recipe.likes);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    const sessionCookie = Cookies.get('session');
+    if (sessionCookie) {
+      const decodedCookie = decodeURIComponent(sessionCookie);
+      const sessionData = JSON.parse(decodedCookie);
+      setSession(sessionData);
+      
+    }
+
+    setComments(recipe.comments);
+
+  }, []);
+  
   const incrementServingSize = () => {
     setServingSize(servingSize + 1);
   };
@@ -29,9 +55,106 @@ export default function RecipePage(props) {
     setCurrentUrl(window.location.href);
   }, []);
 
-  const handleLike = () => {
-    setLikes(likes + 1);
+  useEffect(() => {
+
+    if (session && session.favorites?.includes(recipe.id)) {
+      setIsFavorited(true);
+    } else {
+      setIsFavorited(false);
+    }
+  }, [session, recipe.id]);
+
+  const toggleFavorite = async () => {
+
+    if (!session) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/favorite', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: session.userId,
+          recipeId: recipe.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle favorite');
+      }
+
+      setIsFavorited(!isFavorited); // Update favorite status
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   };
+
+  // Function to handle adding a new comment
+  const handleAddComment = async () => {
+
+    if (!session) return;
+
+    if (newComment.trim() === '') return;
+
+    const formattedComment = `${session.username}: ${newComment}`;
+
+    try {
+      const response = await fetch('/api/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: recipe.id, comment: formattedComment, action: 'edit' }),
+      });
+
+      if (response.ok) {
+        const newCommentObj = { comment: formattedComment, timestamp: new Date().toISOString() };
+        setNewComment('');
+        const updatedComments = [...comments, newCommentObj];
+        setComments(updatedComments); // Update comments with new comment added
+      } else {
+        throw new Error('Failed to add comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
+
+  };
+
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+    }
+    setIsLiked(!isLiked); // Vaihtaa tilan vastakkaiseksi
+    
+    /* Ei toimi
+    // Prepare the data object with the new likes count
+    const data = {
+      likes: newLikes,
+      // ... include other recipe data that needs to be updated
+    };
+
+     // Call the API route for updating the recipe's likes
+  const response = await fetch(`/api/editrecipe/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (response.ok) {
+    console.log('Likes updated successfully!');
+  } else {
+    console.error('Failed to update likes.');
+  }*/
+};
 
   const handleNextImage = () => {
     setCurrentImageIndex((currentImageIndex + 1) % recipe.image.length);
@@ -44,17 +167,13 @@ export default function RecipePage(props) {
   function ImageContainer() {
     return recipe.image[currentImageIndex] ? (
       <div className="relative group w-screen">
-        <div style={{ position: 'relative', width: '100%', height: 400 }}>
-          <Image
-            key={recipe.image[currentImageIndex]?.responsiveImage?.src}
-            data={recipe.image[currentImageIndex]?.responsiveImage}
-            alt={recipe.image[currentImageIndex]?.responsiveImage?.alt}
-            layout="fill"
-            objectFit="cover"
-            objectPosition="50% 50%"
-          />
-        </div>
-
+        <Image
+          key={recipe.image[currentImageIndex]?.responsiveImage?.src}
+          data={recipe.image[currentImageIndex]?.responsiveImage}
+          alt={recipe.image[currentImageIndex]?.responsiveImage?.alt}
+          objectFit={'cover'}
+          className="h-[420px]"
+        />
         <button
           onClick={handlePreviousImage}
           className="absolute top-0 left-0 bg-red-500 text-white p-2 rounded-r opacity-0 group-hover:opacity-50 h-full transition-opacity duration-200"
@@ -75,6 +194,14 @@ export default function RecipePage(props) {
     );
   }
 
+  if (!session && recipe.regonly) {
+    return (
+      <Layout>
+        <div>This recipe is only available for registered users.</div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className={'bg-red-50 min-h-screen'}>
@@ -82,31 +209,42 @@ export default function RecipePage(props) {
           <div className="flex justify-center items-center w-full">
             <ImageContainer />
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-center p-4 gap-4">
-            <div className={'flex'}>
-              {recipe.author?.image && (
-                <>
-                  <div className={'max-h-8 max-w-8'}>
-                    <Image
-                      data={recipe.author.image?.responsiveImage}
-                      alt={recipe.author.image?.responsiveImage?.alt}
-                      className="rounded-full"
-                    />
-                  </div>
-                  <Link href={`/account?user=${recipe.author.id}`}>
-                    <p className="pl-2 text-red-600 hover:underline">{recipe.author.username}</p>
-                  </Link>
-                </>
-              )}
-            </div>
-            <div className={'flex-grow flex sm:justify-end items-center gap-2'}>
-              <button onClick={handleLike} className="bg-red-500 text-white py-2 px-4 rounded">
-                <FontAwesomeIcon icon={faHeart} /> {likes}
+          <div className="flex items-center p-4">
+            {recipe.author?.image && (
+              <>
+                <div className={'max-h-8 max-w-8'}>
+                  <Image
+                    data={recipe.author.image?.responsiveImage}
+                    alt={recipe.author.image?.responsiveImage?.alt}
+                    className="rounded-full"
+                  />
+                </div>
+                <Link href={`/account?user=${recipe.author.id}`}>
+                  <p className="pl-2 text-red-600 hover:underline">{recipe.author.username}</p>
+                </Link>
+              </>
+            )}
+            <div className={'flex-grow flex justify-end items-center gap-2'}>
+            <Link href={`/editrecipe/${recipe.id}`}>
+              <button className="bg-blue-500 text-white py-2 px-4 rounded" disabled={(session?.userId !== recipe.author.id) && (session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q')}>
+                <FontAwesomeIcon icon={faEdit} /> Edit Recipe
               </button>
-              <button onClick={() => window.print()} className="bg-red-500 text-white py-2 px-4 rounded">
+            </Link>
+            <button onClick={handleLike} title="Tykkää" className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}>
+              <FontAwesomeIcon icon={faStar} /> {likes}
+              </button>
+              <button
+                onClick={toggleFavorite}
+                title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
+                className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800': 'bg-red-500 text-white'}`}
+                disabled={!session}
+              >
+                <FontAwesomeIcon icon={faHeart} />
+              </button>
+              <button onClick={() => window.print()} title="Tulosta" className="bg-red-500 text-white py-2 px-4 rounded">
                 <FontAwesomeIcon icon={faPrint} />
               </button>
-              <a
+              <a title="Lähetä sähköpostiin"
                 href={`mailto:?subject=${recipe.title}&body=Check out this recipe: ${currentUrl}`}
                 className="bg-red-500 text-white py-2 px-4 rounded"
               >
@@ -156,6 +294,34 @@ export default function RecipePage(props) {
               </ol>
             </div>
           </div>
+
+          {/* Comments Section */}
+          {/* Display comments */}
+          <div className="mt-8 p-4 bg-white rounded-md shadow-md">
+            <h2 className="text-xl font-semibold mb-4">Comments</h2>
+            <ul>
+              {comments.map((comment, index) => (
+                <li key={index} className="mb-4">
+                  <p className="text-gray-800">{comment.comment}</p>
+                  <p className="text-gray-500 text-sm">{comment.timestamp}</p>
+                </li>
+              ))}
+            </ul>
+            {/* Input field for new comment */}
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add your comment..."
+              className="w-full mt-4 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleAddComment}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+            >
+              Add Comment
+            </button>
+          </div>
+          
         </div>
       </div>
     </Layout>
@@ -207,6 +373,7 @@ query MyQuery($id: ItemId) {
     serving
     title
     description
+    regonly
     author {
       username
       id
@@ -233,6 +400,10 @@ query MyQuery($id: ItemId) {
   }
   instructions {
       instruction
+    }
+  comments {
+    comment
+    timestamp
     }
   }
   user {

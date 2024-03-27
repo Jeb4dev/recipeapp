@@ -16,8 +16,9 @@ export default function NewRecipePage() {
   const [ingredientUnit, setIngredientUnit] = useState('');
   const [instructionText, setInstructionText] = useState('');
   const [images, setImages] = useState([]);
+  const [imageInput, setImageInput] = useState('');
   const [regonly, setRegOnly] = useState(false);
-  const [author, setAuthor] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const sessionCookie = Cookies.get('session');
@@ -25,45 +26,99 @@ export default function NewRecipePage() {
       const decodedCookie = decodeURIComponent(sessionCookie);
       const sessionData = JSON.parse(decodedCookie);
       setSession(sessionData);
-      // Set the author from session if sessionData.username exists
-      sessionData?.username && setAuthor(sessionData.username);
+      
     }
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Prepare the data to send to the API route
-    const data = {
-      title,
-      description,
-      ingredients: ingredients.filter((ingredient) => ingredient.name && ingredient.amount && ingredient.unit),
-      instructions: instructions.filter((instruction) => instruction),
-      images,
-      regonly,
-      author,
-    };
-
-    // Call the API route for creating a new recipe
-    const response = await fetch('/api/createRecipe', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      const responseData = await response.json();
-      // Redirect to the newly created recipe page
-      router.push(`/recipes/${responseData.recipe.id}`);
-    } else {
-      const errorData = await response.json();
-      console.error('Error creating recipe:', errorData.error);
+  
+    // Set the author from session if sessionData.username exists
+    const authorId = session.userId;
+  
+    // Check if required fields are filled
+    if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
+      setError('Missing required fields');
+      return;
+    }
+  
+    // Check if ingredient fields are filled
+    const invalidIngredients = ingredients.filter(
+      (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit
+    );
+    if (invalidIngredients.length > 0) {
+      setError('Invalid ingredient fields:', invalidIngredients);
+      return;
+    }
+  
+    // Check if instruction fields are filled
+    const invalidInstructions = instructions.filter((instruction) => !instruction);
+    if (invalidInstructions.length > 0) {
+      setError('Invalid instruction fields:', invalidInstructions);
+      return;
+    }
+  
+    try {
+      const imageUrls = [];
+      for (const imageUrl of images) {
+        const response = await fetch('/api/uploadImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imageUrl }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Error uploading image to DatoCMS');
+        }
+  
+        const imageData = await response.json();
+        imageUrls.push(imageData);
+      }
+  
+      // Prepare the data to send to the API route
+      const data = {
+        title,
+        description,
+        ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
+        instructions: instructions.filter(instruction => instruction),
+        images: imageUrls,
+        regonly: regonly,
+        author: authorId
+      };
+  
+      // Call the API route for creating a new recipe
+      const createRecipeResponse = await fetch('/api/createRecipe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (createRecipeResponse.ok) {
+        const responseData = await createRecipeResponse.json();
+        // Redirect to the newly created recipe page
+        router.push(`/`);
+      } else {
+        const errorData = await createRecipeResponse.json();
+        setError('Error creating recipe:', errorData.error);
+      }
+    } catch (error) {
+      setError('Error:', error.message);
     }
   };
 
+  const handleCloseModal = () => {
+    setError('');
+  };
+
   const addIngredient = () => {
+    if (!ingredientName || isNaN(ingredientAmount) || !ingredientUnit) {
+      setError('Invalid ingredient data');
+      return;
+    }
     if (ingredientName.trim() !== '' && ingredientAmount !== '' && ingredientUnit.trim() !== '') {
       setIngredients([
         ...ingredients,
@@ -80,6 +135,12 @@ export default function NewRecipePage() {
   };
 
   const addInstruction = () => {
+
+    if (!instructionText) {
+      setError('Invalid instruction data');
+      return;
+    }
+
     if (instructionText.trim() !== '') {
       setInstructions([...instructions, instructionText]);
       setInstructionText('');
@@ -90,15 +151,29 @@ export default function NewRecipePage() {
     setInstructions(instructions.filter((_, i) => i !== index));
   };
 
-  const handleImageUpload = (event) => {
-    const selectedFile = event.target.files[0];
-    setImages([...images, selectedFile]);
+  const handleAddImage = () => {
+    const isValidImageUrl = (url) => {
+      return /^https?:\/\/.*\.(jpg|jpeg|png)$/i.test(url);
+    };
+  
+    if (imageInput.trim() === '') {
+      setError('Image URL cannot be empty');
+      return;
+    }
+  
+    if (!isValidImageUrl(imageInput.trim())) {
+      setError('Invalid image URL. URL must start with "http://" or "https://" and end with ".jpg", ".jpeg", or ".png".');
+      return;
+    }
+  
+    setImages([...images, imageInput.trim()]);
+    setImageInput('');
   };
 
   const removeImage = (index) => {
-    const updatedImages = [...images];
-    updatedImages.splice(index, 1);
-    setImages(updatedImages);
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    setImages(newImages);
   };
 
   const handleRegOnlyToggle = () => {
@@ -107,6 +182,7 @@ export default function NewRecipePage() {
 
   return (
     <Layout>
+      <title>Uusi resepti</title>
       <div className="container mx-auto px-4">
         <h1 className="text-2xl font-bold mb-4 mt-4">Create a New Recipe</h1>
         <form onSubmit={handleSubmit}>
@@ -240,50 +316,105 @@ export default function NewRecipePage() {
 
           {/* Image upload */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Images</label>
-            <label
-              htmlFor="imageUpload"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
-            >
-              Browse Image
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Images
             </label>
-            <input id="imageUpload" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-
-            {/* Display selected images */}
-            <div className="mt-2">
-              {images.map((image, index) => (
-                <div key={index} className="flex items-center mb-2">
-                  <img
-                    src={URL.createObjectURL(image)}
-                    alt={`Uploaded Image ${index}`}
-                    className="w-16 h-16 object-cover rounded mr-2"
-                  />
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                    onClick={() => removeImage(index)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
+            <div className="flex items-center">
+              <input
+                type="text"
+                placeholder="Paste Image URL"
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                className="border border-gray-400 rounded w-full py-2 px-3 mr-2 focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button" // Change the type to button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
+                onClick={handleAddImage}
+              >
+                Add Image
+              </button>
             </div>
+          </div>
+  
+          {/* Display selected images */}
+          <div className="mt-2">
+            {images.map((image, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <img
+                  src={image}
+                  alt={`Uploaded Image ${index}`}
+                  className="w-16 h-16 object-cover rounded mr-2"
+                />
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                  onClick={() => removeImage(index)}
+                >
+                  Remove
+                </button>
+              </div>
+            )
+            )
+            }
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              <input type="checkbox" checked={regonly} onChange={handleRegOnlyToggle} className="mr-2" />
+              <input
+                type="checkbox"
+                checked={regonly}
+                onChange={handleRegOnlyToggle}
+                className="mr-2"
+              />
               Registered users only
             </label>
           </div>
-
+  
           <button
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Create Recipe
           </button>
-        </form>
-      </div>
+              </form>
+            </div>
+    
+    {/* Other JSX elements */}
+    {error && (
+        <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                      Error
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">{error}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button onClick={handleCloseModal} type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </Layout>
   );
 }
