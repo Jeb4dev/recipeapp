@@ -218,7 +218,7 @@ export default function RecipePage(props) {
             <div className={'flex-grow flex justify-end items-center gap-2'}>
               <Link href={`/editrecipe/${recipe.id}`}>
                 <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded"
+                  className={`py-2 px-4 rounded ${session?.userId !== recipe.author.id && session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q' ? 'bg-gray-200 text-gray-800' : 'bg-blue-500 text-white'}`}
                   disabled={session?.userId !== recipe.author.id && session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q'}
                 >
                   <FontAwesomeIcon icon={faEdit} /> Muokkaa reseptiä
