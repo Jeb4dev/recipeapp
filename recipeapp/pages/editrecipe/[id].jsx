@@ -104,7 +104,9 @@ export default function EditRecipePage({ recipeData }) {
     });
 
     if (response.ok) {
-      router.push(`/`);
+      setTimeout(() => {
+        router.push(`/`);
+      }, 3000);
     } else {
       const errorData = await response.json();
       console.error('Error updating recipe:', errorData.error);
@@ -209,7 +211,9 @@ export default function EditRecipePage({ recipeData }) {
         });
         const data = await response.json();
         if (data.success) {
-          router.push(`/`);
+          setTimeout(() => {
+            router.push(`/recipes`);
+          }, 2000);
         } else {
           console.error(data.message);
         }

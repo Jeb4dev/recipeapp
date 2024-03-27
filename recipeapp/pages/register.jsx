@@ -23,7 +23,7 @@ export default function RegisterPage() {
     });
 
     if (response.ok) {
-      await router.push('/profile');
+      await router.push('/login');
     } else {
       const data = await response.json();
       setError(data.error);
