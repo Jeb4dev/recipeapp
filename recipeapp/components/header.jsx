@@ -34,7 +34,7 @@ function LoginProfileComponent() {
           <p className="text-white hover:text-gray-300">{session.username}</p>
         </Link>
         <Link href={'#'} onClick={handleLogout}>
-          <p className="text-white hover:text-gray-300">Logout</p>
+          <p className="text-white hover:text-gray-300">Kirjaudu ulos</p>
         </Link>
       </div>
     );
@@ -42,10 +42,10 @@ function LoginProfileComponent() {
     component = (
       <div className={'flex space-x-4'}>
         <Link href={'/login'}>
-          <p className="text-white hover:text-gray-300">Login</p>
+          <p className="text-white hover:text-gray-300">Kirjaudu</p>
         </Link>
         <Link href={'/register'}>
-          <p className="text-white hover:text-gray-300">Register</p>
+          <p className="text-white hover:text-gray-300">Rekisteröidy</p>
         </Link>
       </div>
     );
@@ -63,12 +63,12 @@ const Header = () => (
         <ul className="flex space-x-4">
           <li>
             <Link href={'/newrecipe'}>
-              <p className="text-white hover:text-gray-300">New Recipe</p>
+              <p className="text-white hover:text-gray-300">Uusi resepti</p>
             </Link>
           </li>
           <li>
             <Link href={'/recipes'}>
-              <p className="text-white hover:text-gray-300">Recipes</p>
+              <p className="text-white hover:text-gray-300">Reseptit</p>
             </Link>
           </li>
           <li>
