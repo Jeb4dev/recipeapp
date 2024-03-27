@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/layout';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -101,6 +100,11 @@ export default function LoginPage() {
           <div className="mt-2 text-center">
             <Link href="/register">
               <p className="font-medium text-indigo-600 hover:text-indigo-500">No account yet? Sign up</p>
+            </Link>
+          </div>
+          <div className="mt-2 text-center">
+            <Link href="/forgot-password">
+              <p className="font-medium text-indigo-600 hover:text-indigo-500">Forgot Password? Reset now</p>
             </Link>
           </div>
         </div>

@@ -37,7 +37,9 @@ describe('Register Handler', () => {
 
   it('should register a new user', async () => {
     // Mock the create method of the client
-    require('@datocms/cma-client-node').buildClient().items.create.mockResolvedValueOnce({ id: 'mockUserId', username: 'testuser' });
+    require('@datocms/cma-client-node')
+      .buildClient()
+      .items.create.mockResolvedValueOnce({ id: 'mockUserId', username: 'testuser' });
 
     // Call the handler function
     await registerHandler(req, res);

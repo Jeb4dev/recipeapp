@@ -22,10 +22,7 @@ describe('editRecipe API Route', () => {
           { name: 'Ingredient 1', amount: 100, unit: 'g' },
           { name: 'Ingredient 2', amount: 2, unit: 'cups' },
         ], // Provide updated ingredients array
-        instructions: [
-          { instruction: 'Instruction 1' },
-          { instruction: 'Instruction 2' },
-        ], // Provide updated instructions array
+        instructions: [{ instruction: 'Instruction 1' }, { instruction: 'Instruction 2' }], // Provide updated instructions array
         regonly: false, // Provide updated value for regonly
         action: 'edit', // Specify action as 'edit' for editing recipe
       },

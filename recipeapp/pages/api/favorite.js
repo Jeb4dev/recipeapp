@@ -18,32 +18,32 @@ export default async function handler(req, res) {
 }
 
 async function updateUserFavorites(userId, recipeId) {
-    const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
-    try {
-      // Fetch current user data to get existing favorites
-      const user = await client.items.find(userId);
-  
-      // Check if the recipeId is already in the favorites array
-      const isFavorite = user.favorites.includes(recipeId);
-  
-      let updatedFavorites;
-  
-      if (isFavorite) {
-        // If the recipeId is already in favorites, remove it
-        updatedFavorites = user.favorites.filter(id => id !== recipeId);
-      } else {
-        // If the recipeId is not in favorites, add it
-        updatedFavorites = [...user.favorites, recipeId];
-      }
-  
-      // Construct updateData with updated favorites list
-      const updateData = { favorites: updatedFavorites };
-  
-      return await client.items.update(userId, updateData);
-    } catch (error) {
-      throw error;
+  const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
+  try {
+    // Fetch current user data to get existing favorites
+    const user = await client.items.find(userId);
+
+    // Check if the recipeId is already in the favorites array
+    const isFavorite = user.favorites.includes(recipeId);
+
+    let updatedFavorites;
+
+    if (isFavorite) {
+      // If the recipeId is already in favorites, remove it
+      updatedFavorites = user.favorites.filter((id) => id !== recipeId);
+    } else {
+      // If the recipeId is not in favorites, add it
+      updatedFavorites = [...user.favorites, recipeId];
     }
+
+    // Construct updateData with updated favorites list
+    const updateData = { favorites: updatedFavorites };
+
+    return await client.items.update(userId, updateData);
+  } catch (error) {
+    throw error;
   }
+}
 
 async function getUserFavorites(userId) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });

@@ -30,7 +30,7 @@ async function updateRecipeLikes(userId, recipeId) {
 
     if (isLiked) {
       // If the userId is already in userLikes, remove it
-      updatedUserLikes = recipe.userLikes.filter(id => id !== userId);
+      updatedUserLikes = recipe.userLikes.filter((id) => id !== userId);
     } else {
       // If the userId is not in userLikes, add it
       updatedUserLikes = [...recipe.userLikes, userId];

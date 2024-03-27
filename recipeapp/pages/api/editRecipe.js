@@ -47,18 +47,18 @@ async function editRecipe(id, title, description, ingredients, instructions, reg
     }
 
     // Update existing ingredients with the provided data
-for (const ingredientId of updatedRecipe.ingredients) {
-  const index = updatedRecipe.ingredients.indexOf(ingredientId);
-  if (ingredients[index]) {
-    await client.items.update(ingredientId, {
-      name: ingredients[index].name,
-      amount: ingredients[index].amount,
-      unit: ingredients[index].unit,
-    });
-  } else {
-    console.warn('Ingredient not found for index:', index);
-  }
-}
+    for (const ingredientId of updatedRecipe.ingredients) {
+      const index = updatedRecipe.ingredients.indexOf(ingredientId);
+      if (ingredients[index]) {
+        await client.items.update(ingredientId, {
+          name: ingredients[index].name,
+          amount: ingredients[index].amount,
+          unit: ingredients[index].unit,
+        });
+      } else {
+        console.warn('Ingredient not found for index:', index);
+      }
+    }
 
     // Add new instructions if there are more instructions in the 'instructions' array
     const existingInstructionIds = updatedRecipe.instructions;
@@ -67,27 +67,25 @@ for (const ingredientId of updatedRecipe.ingredients) {
 
     if (numNewInstructions > 0) {
       const newInstructions = instructions.slice(numExistingInstructions);
-      const formattedInstructions = newInstructions.map(instructionObj => instructionObj.instruction);
+      const formattedInstructions = newInstructions.map((instructionObj) => instructionObj.instruction);
       const createdInstructions = await createInstructions(formattedInstructions);
-      const newInstructionIds = createdInstructions.map(instruction => instruction.id);
-      
+      const newInstructionIds = createdInstructions.map((instruction) => instruction.id);
+
       // Update the recipe to include the newly created instruction IDs
       const updatedRecipeWithNewInstructions = await client.items.update(id, {
         instructions: [...existingInstructionIds, ...newInstructionIds],
       });
-      
     } else if (numNewInstructions < 0) {
       // Remove excess instructions from the recipe
       const instructionsToRemove = existingInstructionIds.slice(instructions.length);
       for (const instructionId of instructionsToRemove) {
         await client.items.destroy(instructionId);
       }
-      
+
       // Update the recipe to remove the excess instructions
       const updatedRecipeWithoutExcessInstructions = await client.items.update(id, {
         instructions: existingInstructionIds.slice(0, instructions.length),
       });
-      
     }
 
     // Add new ingredients if there are more ingredients in the 'ingredients' array
@@ -97,26 +95,25 @@ for (const ingredientId of updatedRecipe.ingredients) {
 
     if (numNewIngredients > 0) {
       const newIngredients = ingredients.slice(numExistingIngredients);
-      const formattedNewIngredients = newIngredients.map(ingredientObj => ({
+      const formattedNewIngredients = newIngredients.map((ingredientObj) => ({
         name: ingredientObj.name,
         amount: ingredientObj.amount,
         unit: ingredientObj.unit,
       }));
       const createdIngredients = await createIngredients(formattedNewIngredients);
-      const newIngredientIds = createdIngredients.map(ingredient => ingredient.id);
-      
+      const newIngredientIds = createdIngredients.map((ingredient) => ingredient.id);
+
       // Update the recipe to include the newly created ingredient IDs
       const updatedRecipeWithNewIngredients = await client.items.update(id, {
         ingredients: [...existingIngredientIds, ...newIngredientIds],
       });
-      
     } else if (numNewIngredients < 0) {
       // Remove excess ingredients from the recipe
       const ingredientsToRemove = existingIngredientIds.slice(ingredients.length);
       for (const ingredientId of ingredientsToRemove) {
         await client.items.destroy(ingredientId);
       }
-      
+
       // Update the recipe to remove the excess ingredients
       const updatedRecipeWithoutExcessIngredients = await client.items.update(id, {
         ingredients: existingIngredientIds.slice(0, ingredients.length),
@@ -133,13 +130,15 @@ for (const ingredientId of updatedRecipe.ingredients) {
 async function createInstructions(instructions) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   try {
-    const createdInstructions = await Promise.all(instructions.map(async (instruction) => {
-      const newInstruction = await client.items.create({
-        item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
-        instruction: instruction
-      });
-      return newInstruction;
-    }));
+    const createdInstructions = await Promise.all(
+      instructions.map(async (instruction) => {
+        const newInstruction = await client.items.create({
+          item_type: { type: 'item_type', id: 'cYA4fVw2QOq8FY766ObmqA' },
+          instruction: instruction,
+        });
+        return newInstruction;
+      }),
+    );
     return createdInstructions;
   } catch (error) {
     console.log('Error creating instructions');
@@ -150,15 +149,17 @@ async function createInstructions(instructions) {
 async function createIngredients(ingredients) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   try {
-    const createdIngredients = await Promise.all(ingredients.map(async (ingredient) => {
-      const newIngredient = await client.items.create({
-        item_type: { type: 'item_type', id: 'KzctSfFlRaqAAJRJYezRzA' },
-        name: ingredient.name,
-        amount: ingredient.amount,
-        unit: ingredient.unit,
-      });
-      return newIngredient;
-    }));
+    const createdIngredients = await Promise.all(
+      ingredients.map(async (ingredient) => {
+        const newIngredient = await client.items.create({
+          item_type: { type: 'item_type', id: 'KzctSfFlRaqAAJRJYezRzA' },
+          name: ingredient.name,
+          amount: ingredient.amount,
+          unit: ingredient.unit,
+        });
+        return newIngredient;
+      }),
+    );
     return createdIngredients;
   } catch (error) {
     console.log('Error creating ingredients');

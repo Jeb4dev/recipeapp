@@ -1,5 +1,4 @@
 import handler from '../pages/api/auth/login';
-import { request } from '../../../lib/datocms';
 import { serialize } from 'cookie';
 import { encrypt } from '../../../utils/encrypt';
 
@@ -62,17 +61,21 @@ describe('/api/auth/login Route', () => {
     // Assertions
     expect(handler.signIn).toHaveBeenCalledWith(mockReq.body.email, mockReq.body.password);
     expect(encrypt).toHaveBeenCalledWith(JSON.stringify(mockReq.body));
-    expect(serialize).toHaveBeenCalledWith('session', JSON.stringify({
-      iv: mockEncryptedSessionData.iv,
-      content: mockEncryptedSessionData.content,
-      username: mockUser.name,
-      userId: mockUser.id,
-    }), {
-      httpOnly: true,
-      secure: true,
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    });
+    expect(serialize).toHaveBeenCalledWith(
+      'session',
+      JSON.stringify({
+        iv: mockEncryptedSessionData.iv,
+        content: mockEncryptedSessionData.content,
+        username: mockUser.name,
+        userId: mockUser.id,
+      }),
+      {
+        httpOnly: true,
+        secure: true,
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+      },
+    );
     expect(mockRes.setHeader).toHaveBeenCalledWith('Set-Cookie', mockSerializedCookie);
     expect(mockRes.status).toHaveBeenCalledWith(200);
     expect(mockRes.json).toHaveBeenCalledWith({ message: 'Successfully set cookie!' });

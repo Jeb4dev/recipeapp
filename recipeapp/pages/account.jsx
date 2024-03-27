@@ -119,14 +119,14 @@ const AccountPage = (props) => {
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold my-4">Own recipes</h1>
           <div className="flex flex-wrap justify-start gap-8">
-          {userRecipes.length > 0 ? (
-            userRecipes
+            {userRecipes.length > 0 ? (
+              userRecipes
                 .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-                .map((recipe, index) => (
-                  <RecipeCard key={index} recipe={recipe} />
-                ))
+                .map((recipe, index) => <RecipeCard key={index} recipe={recipe} />)
             ) : (
-              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>No own recipes</p></div>
+              <div style={{ marginTop: '30px', marginBottom: '50px' }}>
+                <p>No own recipes</p>
+              </div>
             )}
           </div>
         </div>
@@ -135,13 +135,13 @@ const AccountPage = (props) => {
           <h1 className="text-2xl font-bold my-4">Favorites</h1>
           <div className="flex flex-wrap justify-start gap-8">
             {user.favorites.length > 0 ? (
-            user.favorites
-            .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
-            .map((recipe, index) => (
-              <RecipeCard key={index} recipe={recipe} />
-                ))
+              user.favorites
+                .sort((a, b) => new Date(b._createdAt) - new Date(a._createdAt))
+                .map((recipe, index) => <RecipeCard key={index} recipe={recipe} />)
             ) : (
-              <div style={{marginTop: "30px", marginBottom:"50px"}}><p>No favorites</p></div>
+              <div style={{ marginTop: '30px', marginBottom: '50px' }}>
+                <p>No favorites</p>
+              </div>
             )}
           </div>
         </div>

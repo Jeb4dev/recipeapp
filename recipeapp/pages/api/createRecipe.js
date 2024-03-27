@@ -2,7 +2,7 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { title, description, ingredients, instructions, author, regonly, images} = req.body;
+    const { title, description, ingredients, instructions, author, regonly, images } = req.body;
 
     if (!title || !description || !ingredients || !instructions) {
       throw new Error('Missing key fields');
@@ -74,16 +74,15 @@ async function createRecipe(title, description, ingredients, instructions, autho
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
 
   try {
-
-    const instructionIDs = instructions.map(instruction => {
+    const instructionIDs = instructions.map((instruction) => {
       return instruction.id;
     });
 
-    const ingredientIDs = ingredients.map(ingredient => {
-    return ingredient.id;
+    const ingredientIDs = ingredients.map((ingredient) => {
+      return ingredient.id;
     });
 
-    const imageArray = images.map(image => ({
+    const imageArray = images.map((image) => ({
       upload_id: image.upload.id,
     }));
 
