@@ -41,7 +41,8 @@ export default function EditRecipePage({ recipeData }) {
       setDescription(recipeData.recipe.description);
       setIngredients(recipeData.recipe.ingredients);
       setInstructions(recipeData.recipe.instructions);
-      // setImages(recipeData.recipe.images); Ei toimi WIP
+      const imageUrls = recipeData.recipe.image.map((image) => image.responsiveImage.src);
+      setImages(imageUrls);
       setRegOnly(recipeData.recipe.regonly);
     }
   }, [recipeData]);
@@ -78,36 +79,58 @@ export default function EditRecipePage({ recipeData }) {
       return;
     }
 
-    const { id } = recipeData.recipe;
-
-    // Prepare the data to send to the API route
-    const data = {
-      id: id,
-      title,
-      description,
-      ingredients: ingredients.filter((ingredient) => ingredient.name && ingredient.amount && ingredient.unit),
-      instructions: instructions.filter((instruction) => instruction),
-      // images: images.map(image => ({ localPath: URL.createObjectURL(image), filename: image.name })),
-      regonly: regonly,
-      action: 'edit',
-    };
-
-    // Call the API route for updating the recipe
-    const response = await fetch(`/api/editRecipe/`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (response.ok) {
-      setTimeout(() => {
-        router.push(`/`);
-      }, 3000);
-    } else {
-      const errorData = await response.json();
-      console.error('Error updating recipe:', errorData.error);
+    try {
+      const imageUrls = [];
+      for (const imageUrl of images) {
+        const response = await fetch('/api/uploadImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ imageUrl }),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Error uploading image to DatoCMS');
+        }
+  
+        const imageData = await response.json();
+        imageUrls.push(imageData);
+      }
+  
+      const { id } = recipeData.recipe;
+  
+      // Prepare the data to send to the API route
+      const data = {
+        id: id,
+        title,
+        description,
+        ingredients: ingredients.filter((ingredient) => ingredient.name && ingredient.amount && ingredient.unit),
+        instructions: instructions.filter((instruction) => instruction),
+        images: imageUrls,
+        regonly: regonly,
+        action: 'edit',
+      };
+  
+      // Call the API route for updating the recipe
+      const response = await fetch(`/api/editRecipe/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (response.ok) {
+        setTimeout(() => {
+          router.push(`/`);
+        }, 3000);
+      } else {
+        const errorData = await response.json();
+        console.error('Error updating recipe:', errorData.error);
+      }
+    } catch (error) {
+      console.error('Error updating recipe:', error);
     }
   };
 
