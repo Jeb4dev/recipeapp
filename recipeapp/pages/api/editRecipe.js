@@ -2,7 +2,7 @@ import { buildClient } from '@datocms/cma-client-node';
 
 export default async function handler(req, res) {
   try {
-    const { id, title, description, ingredients, instructions, regonly, action } = req.body;
+    const { id, title, description, ingredients, instructions, images, regonly, action } = req.body;
 
     if (!id) {
       throw new Error('Recipe ID is required');
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
     let response;
     if (action === 'edit') {
-      response = await editRecipe(id, title, description, ingredients, instructions, regonly);
+      response = await editRecipe(id, title, description, ingredients, instructions, images, regonly);
     } else if (action === 'delete') {
       response = await deleteRecipe(id);
     } else {
@@ -24,14 +24,20 @@ export default async function handler(req, res) {
   }
 }
 
-async function editRecipe(id, title, description, ingredients, instructions, regonly) {
+async function editRecipe(id, title, description, ingredients, instructions, images, regonly) {
   const client = buildClient({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   try {
+
+    const imageArray = images.map((image) => ({
+      upload_id: image.upload.id,
+    }));
+
     // Update recipe with the provided data
     const updatedRecipe = await client.items.update(id, {
       title,
       description,
       regonly,
+      image: imageArray,
     });
 
     // Update existing instructions with the provided data
