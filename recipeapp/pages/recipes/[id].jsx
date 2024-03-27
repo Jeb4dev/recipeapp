@@ -6,7 +6,7 @@ import { Image } from 'react-datocms';
 import Cookies from 'js-cookie';
 
 import { request } from '../../lib/datocms';
-import Layout from '../../components/layout';
+import Layout from '../../components/Layout';
 
 export default function RecipePage(props) {
   const recipe = props.data.recipe;

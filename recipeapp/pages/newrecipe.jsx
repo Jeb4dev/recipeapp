@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { MdDelete } from 'react-icons/md';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 import Cookies from 'js-cookie';
 
 export default function NewRecipePage() {

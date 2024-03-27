@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { router } from 'next/client';
-import Layout from '../components/layout';
+import Layout from '../components/Layout';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
