@@ -34,10 +34,10 @@ export default function RecipesPage({ data }) {
       <div className="py-10 mx-auto max-w-[90%]">
         <div>
           <div className="px-10">
-            <h1 className="text-2xl font-bold mb-4">All Recipes</h1>
+            <h1 className="text-2xl font-bold mb-4">Kaikki reseptit</h1>
             <input
               type="text"
-              placeholder="Search by name or ingredient"
+              placeholder="Hae nimellä tai ainesosalla"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="mb-4 p-2 border rounded w-1/5"

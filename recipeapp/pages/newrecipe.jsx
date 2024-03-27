@@ -184,11 +184,11 @@ export default function NewRecipePage() {
     <Layout>
       <title>Uusi resepti</title>
       <div className="container mx-auto px-4">
-        <h1 className="text-2xl font-bold mb-4 mt-4">Create a New Recipe</h1>
+        <h1 className="text-2xl font-bold mb-4 mt-4">Luo uusi resepti</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-              Title
+              Otsikko
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -201,7 +201,7 @@ export default function NewRecipePage() {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-              Description
+              Kuvaus
             </label>
             <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -215,7 +215,7 @@ export default function NewRecipePage() {
           <div className="mb-4 flex items-bottom">
             <div className="mr-2">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientName">
-                Ingredient Name
+                Ainesosan nimi
               </label>
               <input
                 className="shadow appearance-none border rounded w-32 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -227,7 +227,7 @@ export default function NewRecipePage() {
             </div>
             <div className="mr-2">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientAmount">
-                Amount
+                Määrä
               </label>
               <input
                 className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -245,7 +245,7 @@ export default function NewRecipePage() {
             </div>
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientUnit">
-                Unit
+                Yksikkö
               </label>
               <input
                 className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -261,7 +261,7 @@ export default function NewRecipePage() {
               onClick={addIngredient}
               style={{ marginLeft: '8px' }}
             >
-              Add Ingredient
+              Lisää ainesosa
             </button>
           </div>
 
@@ -282,7 +282,7 @@ export default function NewRecipePage() {
           {/* New instruction input field */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="instruction">
-              Instruction
+            Valmistusvaiheet
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -296,7 +296,7 @@ export default function NewRecipePage() {
               type="button"
               onClick={addInstruction}
             >
-              Add Instruction
+              Lisää valmistusvaihe
             </button>
           </div>
 
@@ -316,11 +316,11 @@ export default function NewRecipePage() {
 
           {/* Image upload */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Images</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Kuvat</label>
             <div className="flex items-center">
               <input
                 type="text"
-                placeholder="Paste Image URL"
+                placeholder="Lisää kuvan URL"
                 value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
                 className="border border-gray-400 rounded w-full py-2 px-3 mr-2 focus:outline-none focus:border-blue-500"
@@ -330,7 +330,7 @@ export default function NewRecipePage() {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
                 onClick={handleAddImage}
               >
-                Add Image
+                Lisää kuva
               </button>
             </div>
           </div>
@@ -344,7 +344,7 @@ export default function NewRecipePage() {
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                   onClick={() => removeImage(index)}
                 >
-                  Remove
+                  Poista
                 </button>
               </div>
             ))}
@@ -353,7 +353,7 @@ export default function NewRecipePage() {
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               <input type="checkbox" checked={regonly} onChange={handleRegOnlyToggle} className="mr-2" />
-              Registered users only
+              Näytä vain rekisteröityneille käyttäjille
             </label>
           </div>
 
@@ -361,7 +361,7 @@ export default function NewRecipePage() {
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
             type="submit"
           >
-            Create Recipe
+            Luo resepti
           </button>
         </form>
       </div>
@@ -412,7 +412,7 @@ export default function NewRecipePage() {
                   type="button"
                   className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                 >
-                  Close
+                  Sulje
                 </button>
               </div>
             </div>

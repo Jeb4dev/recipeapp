@@ -181,14 +181,14 @@ export default function RecipePage(props) {
         </button>
       </div>
     ) : (
-      <div className={'text-black'}>No images</div>
+      <div className={'text-black'}>Ei kuvia</div>
     );
   }
 
   if (!session && recipe.regonly) {
     return (
       <Layout>
-        <div>This recipe is only available for registered users.</div>
+        <div>Tämä resepti näkyy vain kirjautuneille käyttäjille.</div>
       </Layout>
     );
   }
@@ -233,7 +233,7 @@ export default function RecipePage(props) {
               </button>
               <button
                 onClick={toggleFavorite}
-                title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                title={isFavorited ? 'Poista suosikeista' : 'Lisää suosikkeihin'}
                 className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}
                 disabled={!session}
               >
@@ -331,14 +331,14 @@ export default function RecipePage(props) {
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add your comment..."
+              placeholder="Kirjoita kommentti..."
               className="w-full mt-4 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
               onClick={handleAddComment}
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
             >
-              Add Comment
+              Lisää kommentti
             </button>
           </div>
         </div>
