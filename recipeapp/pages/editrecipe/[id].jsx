@@ -251,7 +251,7 @@ export default function EditRecipePage({ recipeData }) {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-              Title
+              Otsikko
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -264,7 +264,7 @@ export default function EditRecipePage({ recipeData }) {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-              Description
+              Kuvaus
             </label>
             <textarea
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -278,7 +278,7 @@ export default function EditRecipePage({ recipeData }) {
           <div className="mb-4 flex items-bottom">
             <div className="mr-2">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientName">
-                Ingredient Name
+                Ainesosan nimi
               </label>
               <input
                 className="shadow appearance-none border rounded w-32 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -290,7 +290,7 @@ export default function EditRecipePage({ recipeData }) {
             </div>
             <div className="mr-2">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientAmount">
-                Amount
+                Määrä
               </label>
               <input
                 className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -308,7 +308,7 @@ export default function EditRecipePage({ recipeData }) {
             </div>
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="ingredientUnit">
-                Unit
+                Yksikkö
               </label>
               <input
                 className="shadow appearance-none border rounded w-16 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -324,7 +324,7 @@ export default function EditRecipePage({ recipeData }) {
               onClick={addIngredient}
               style={{ marginLeft: '8px' }}
             >
-              Add Ingredient
+              Lisää ainesosa
             </button>
           </div>
 
@@ -345,7 +345,7 @@ export default function EditRecipePage({ recipeData }) {
           {/* New instruction input field */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="instruction">
-              Instruction
+              Valmistusvaiheet
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -359,7 +359,7 @@ export default function EditRecipePage({ recipeData }) {
               type="button"
               onClick={addInstruction}
             >
-              Add Instruction
+              Lisää valmistusvaihe
             </button>
           </div>
 
@@ -379,11 +379,11 @@ export default function EditRecipePage({ recipeData }) {
 
           {/* Image upload */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Images</label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Kuvat</label>
             <div className="flex items-center">
               <input
                 type="text"
-                placeholder="Paste Image URL"
+                placeholder="Lisää kuvan URL"
                 value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
                 className="border border-gray-400 rounded w-full py-2 px-3 mr-2 focus:outline-none focus:border-blue-500"
@@ -393,7 +393,7 @@ export default function EditRecipePage({ recipeData }) {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer"
                 onClick={handleAddImage}
               >
-                Add Image
+                Lisää kuva
               </button>
             </div>
           </div>
@@ -407,7 +407,7 @@ export default function EditRecipePage({ recipeData }) {
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                   onClick={() => removeImage(index)}
                 >
-                  Remove
+                  Poista
                 </button>
               </div>
             ))}
@@ -416,7 +416,7 @@ export default function EditRecipePage({ recipeData }) {
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               <input type="checkbox" checked={regonly} onChange={handleRegOnlyToggle} className="mr-2" />
-              Registered users only
+              Näytä vain rekisteröityneille käyttäjille
             </label>
           </div>
 
@@ -424,15 +424,15 @@ export default function EditRecipePage({ recipeData }) {
           <div className="flex justify-between p-4">
             <div className="flex gap-2">
               <button className="bg-blue-500 text-white py-2 px-4 rounded" onClick={handleSubmit}>
-                <FontAwesomeIcon icon={faEdit} /> Edit
+                <FontAwesomeIcon icon={faEdit} /> Muokkaa
               </button>
               <button className="bg-gray-500 text-white py-2 px-4 rounded" onClick={handleDiscard}>
-                <FontAwesomeIcon icon={faTimes} /> Discard changes
+                <FontAwesomeIcon icon={faTimes} /> Peru muutokset
               </button>
             </div>
             <div>
               <button className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleDelete}>
-                <FontAwesomeIcon icon={faTrash} /> DELETE
+                <FontAwesomeIcon icon={faTrash} /> POISTA
               </button>
             </div>
           </div>
