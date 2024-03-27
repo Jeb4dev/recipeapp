@@ -1,4 +1,4 @@
-import {router} from "next/client";
+import { router } from 'next/client';
 
 router.post('/api/auth/reset-password', async (req, res) => {
   const { newPassword, token, otp } = req.body;
@@ -25,18 +25,18 @@ router.post('/api/auth/reset-password', async (req, res) => {
 });
 
 function verifyOtp(otp) {
-    // TODO: Replace this with your actual OTP verification logic
-    const isValid = true; // This should be replaced with actual OTP verification logic
-    return isValid;
+  // TODO: Replace this with your actual OTP verification logic
+  const isValid = true; // This should be replaced with actual OTP verification logic
+  return isValid;
 }
 
 async function findUserByResetToken(token) {
-    // TODO: Replace this with your actual logic for finding a user by reset token
-    const user = null; // This should be replaced with actual logic for finding a user by reset token
-    return user;
+  // TODO: Replace this with your actual logic for finding a user by reset token
+  const user = null; // This should be replaced with actual logic for finding a user by reset token
+  return user;
 }
 
 async function updateUserPassword(user, newPassword) {
-    // TODO: Replace this with your actual logic for updating a user's password
-    // This might involve hashing the new password and storing the hash in your database
+  // TODO: Replace this with your actual logic for updating a user's password
+  // This might involve hashing the new password and storing the hash in your database
 }

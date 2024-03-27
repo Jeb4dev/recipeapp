@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout';
-import Link from 'next/link';
 
 export default function ResetPassword() {
   const [newPassword, setNewPassword] = useState('');

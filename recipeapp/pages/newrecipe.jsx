@@ -26,38 +26,37 @@ export default function NewRecipePage() {
       const decodedCookie = decodeURIComponent(sessionCookie);
       const sessionData = JSON.parse(decodedCookie);
       setSession(sessionData);
-      
     }
   }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+
     // Set the author from session if sessionData.username exists
     const authorId = session.userId;
-  
+
     // Check if required fields are filled
     if (!title || !description || ingredients.length === 0 || instructions.length === 0) {
       setError('Missing required fields');
       return;
     }
-  
+
     // Check if ingredient fields are filled
     const invalidIngredients = ingredients.filter(
-      (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit
+      (ingredient) => !ingredient.name || !ingredient.amount || !ingredient.unit,
     );
     if (invalidIngredients.length > 0) {
       setError('Invalid ingredient fields:', invalidIngredients);
       return;
     }
-  
+
     // Check if instruction fields are filled
     const invalidInstructions = instructions.filter((instruction) => !instruction);
     if (invalidInstructions.length > 0) {
       setError('Invalid instruction fields:', invalidInstructions);
       return;
     }
-  
+
     try {
       const imageUrls = [];
       for (const imageUrl of images) {
@@ -68,26 +67,26 @@ export default function NewRecipePage() {
           },
           body: JSON.stringify({ imageUrl }),
         });
-  
+
         if (!response.ok) {
           throw new Error('Error uploading image to DatoCMS');
         }
-  
+
         const imageData = await response.json();
         imageUrls.push(imageData);
       }
-  
+
       // Prepare the data to send to the API route
       const data = {
         title,
         description,
-        ingredients: ingredients.filter(ingredient => ingredient.name && ingredient.amount && ingredient.unit),
-        instructions: instructions.filter(instruction => instruction),
+        ingredients: ingredients.filter((ingredient) => ingredient.name && ingredient.amount && ingredient.unit),
+        instructions: instructions.filter((instruction) => instruction),
         images: imageUrls,
         regonly: regonly,
-        author: authorId
+        author: authorId,
       };
-  
+
       // Call the API route for creating a new recipe
       const createRecipeResponse = await fetch('/api/createRecipe', {
         method: 'POST',
@@ -96,7 +95,7 @@ export default function NewRecipePage() {
         },
         body: JSON.stringify(data),
       });
-  
+
       if (createRecipeResponse.ok) {
         const responseData = await createRecipeResponse.json();
         // Redirect to the newly created recipe page
@@ -135,7 +134,6 @@ export default function NewRecipePage() {
   };
 
   const addInstruction = () => {
-
     if (!instructionText) {
       setError('Invalid instruction data');
       return;
@@ -155,17 +153,19 @@ export default function NewRecipePage() {
     const isValidImageUrl = (url) => {
       return /^https?:\/\/.*\.(jpg|jpeg|png)$/i.test(url);
     };
-  
+
     if (imageInput.trim() === '') {
       setError('Image URL cannot be empty');
       return;
     }
-  
+
     if (!isValidImageUrl(imageInput.trim())) {
-      setError('Invalid image URL. URL must start with "http://" or "https://" and end with ".jpg", ".jpeg", or ".png".');
+      setError(
+        'Invalid image URL. URL must start with "http://" or "https://" and end with ".jpg", ".jpeg", or ".png".',
+      );
       return;
     }
-  
+
     setImages([...images, imageInput.trim()]);
     setImageInput('');
   };
@@ -316,9 +316,7 @@ export default function NewRecipePage() {
 
           {/* Image upload */}
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Images
-            </label>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Images</label>
             <div className="flex items-center">
               <input
                 type="text"
@@ -336,16 +334,12 @@ export default function NewRecipePage() {
               </button>
             </div>
           </div>
-  
+
           {/* Display selected images */}
           <div className="mt-2">
             {images.map((image, index) => (
               <div key={index} className="flex items-center mb-2">
-                <img
-                  src={image}
-                  alt={`Uploaded Image ${index}`}
-                  className="w-16 h-16 object-cover rounded mr-2"
-                />
+                <img src={image} alt={`Uploaded Image ${index}`} className="w-16 h-16 object-cover rounded mr-2" />
                 <button
                   className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
                   onClick={() => removeImage(index)}
@@ -353,45 +347,52 @@ export default function NewRecipePage() {
                   Remove
                 </button>
               </div>
-            )
-            )
-            }
+            ))}
           </div>
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              <input
-                type="checkbox"
-                checked={regonly}
-                onChange={handleRegOnlyToggle}
-                className="mr-2"
-              />
+              <input type="checkbox" checked={regonly} onChange={handleRegOnlyToggle} className="mr-2" />
               Registered users only
             </label>
           </div>
-  
+
           <button
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 focus:outline-none focus:shadow-outline"
             type="submit"
           >
             Create Recipe
           </button>
-              </form>
-            </div>
-    
-    {/* Other JSX elements */}
-    {error && (
+        </form>
+      </div>
+
+      {/* Other JSX elements */}
+      {error && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="fixed inset-0 transition-opacity" aria-hidden="true">
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
+              &#8203;
+            </span>
+            <div
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-headline"
+            >
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    <svg className="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <svg
+                      className="h-6 w-6 text-red-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </div>
@@ -406,7 +407,11 @@ export default function NewRecipePage() {
                 </div>
               </div>
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button onClick={handleCloseModal} type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                <button
+                  onClick={handleCloseModal}
+                  type="button"
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
                   Close
                 </button>
               </div>
@@ -414,7 +419,6 @@ export default function NewRecipePage() {
           </div>
         </div>
       )}
-
     </Layout>
   );
 }

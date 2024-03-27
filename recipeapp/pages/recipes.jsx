@@ -21,7 +21,6 @@ export default function RecipesPage({ data }) {
     router.push(`/recipes/${randomRecipe.id}`);
   };
 
-
   return (
     <Layout>
       <title>Reseptit</title>
@@ -36,12 +35,14 @@ export default function RecipesPage({ data }) {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="mb-4 p-2 border rounded w-1/5"
             />
-            <button style={{marginLeft: "20px"}} onClick={handleRandomRecipe} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Satunnainen resepti
+            <button
+              style={{ marginLeft: '20px' }}
+              onClick={handleRandomRecipe}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Satunnainen resepti
             </button>
-            <div style={{marginTop: "0px", marginBottom:"0px", marginLeft:"0px"}}>
-            
-            </div>
+            <div style={{ marginTop: '0px', marginBottom: '0px', marginLeft: '0px' }}></div>
           </div>
           <div className="flex flex-wrap justify-around gap-4 max-w-full">
             {filteredRecipes.map((recipe) => (

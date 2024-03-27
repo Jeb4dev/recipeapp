@@ -4,23 +4,21 @@ import { Image } from 'react-datocms';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faHeart, faPrint, faStar, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEnvelope, faHeart, faPrint, faStar } from '@fortawesome/free-solid-svg-icons';
 
 import Cookies from 'js-cookie';
 
 export default function RecipePage(props) {
-
   const recipe = props.data.recipe;
 
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState([]);
-  
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentUrl, setCurrentUrl] = useState('');
 
   const initialServingSize = recipe.serving || 1;
   const [servingSize, setServingSize] = useState(initialServingSize);
-
 
   const [isFavorited, setIsFavorited] = useState(false);
   const [likes, setLikes] = useState(recipe.likes);
@@ -34,13 +32,11 @@ export default function RecipePage(props) {
       const decodedCookie = decodeURIComponent(sessionCookie);
       const sessionData = JSON.parse(decodedCookie);
       setSession(sessionData);
-      
     }
 
     setComments(recipe.comments);
-
   }, []);
-  
+
   const incrementServingSize = () => {
     setServingSize(servingSize + 1);
   };
@@ -56,7 +52,6 @@ export default function RecipePage(props) {
   }, []);
 
   useEffect(() => {
-
     if (session && session.favorites?.includes(recipe.id)) {
       setIsFavorited(true);
     } else {
@@ -65,7 +60,6 @@ export default function RecipePage(props) {
   }, [session, recipe.id]);
 
   const toggleFavorite = async () => {
-
     if (!session) {
       return;
     }
@@ -94,7 +88,6 @@ export default function RecipePage(props) {
 
   // Function to handle adding a new comment
   const handleAddComment = async () => {
-
     if (!session) return;
 
     if (newComment.trim() === '') return;
@@ -121,9 +114,7 @@ export default function RecipePage(props) {
     } catch (error) {
       console.error('Error adding comment:', error);
     }
-
   };
-
 
   const handleLike = () => {
     if (isLiked) {
@@ -132,7 +123,7 @@ export default function RecipePage(props) {
       setLikes(likes + 1);
     }
     setIsLiked(!isLiked); // Vaihtaa tilan vastakkaiseksi
-    
+
     /* Ei toimi
     // Prepare the data object with the new likes count
     const data = {
@@ -154,7 +145,7 @@ export default function RecipePage(props) {
   } else {
     console.error('Failed to update likes.');
   }*/
-};
+  };
 
   const handleNextImage = () => {
     setCurrentImageIndex((currentImageIndex + 1) % recipe.image.length);
@@ -225,26 +216,38 @@ export default function RecipePage(props) {
               </>
             )}
             <div className={'flex-grow flex justify-end items-center gap-2'}>
-            <Link href={`/editrecipe/${recipe.id}`}>
-              <button className="bg-blue-500 text-white py-2 px-4 rounded" disabled={(session?.userId !== recipe.author.id) && (session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q')}>
-                <FontAwesomeIcon icon={faEdit} /> Edit Recipe
-              </button>
-            </Link>
-            <button onClick={handleLike} title="Tykkää" className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}>
-              <FontAwesomeIcon icon={faStar} /> {likes}
+              <Link href={`/editrecipe/${recipe.id}`}>
+                <button
+                  className="bg-blue-500 text-white py-2 px-4 rounded"
+                  disabled={session?.userId !== recipe.author.id && session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q'}
+                >
+                  <FontAwesomeIcon icon={faEdit} /> Edit Recipe
+                </button>
+              </Link>
+              <button
+                onClick={handleLike}
+                title="Tykkää"
+                className={` py-2 px-4 rounded ${isLiked ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}
+              >
+                <FontAwesomeIcon icon={faStar} /> {likes}
               </button>
               <button
                 onClick={toggleFavorite}
-                title={isFavorited ? "Remove from Favorites" : "Add to Favorites"}
-                className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800': 'bg-red-500 text-white'}`}
+                title={isFavorited ? 'Remove from Favorites' : 'Add to Favorites'}
+                className={`py-2 px-4 rounded ${isFavorited ? 'bg-gray-200 text-gray-800' : 'bg-red-500 text-white'}`}
                 disabled={!session}
               >
                 <FontAwesomeIcon icon={faHeart} />
               </button>
-              <button onClick={() => window.print()} title="Tulosta" className="bg-red-500 text-white py-2 px-4 rounded">
+              <button
+                onClick={() => window.print()}
+                title="Tulosta"
+                className="bg-red-500 text-white py-2 px-4 rounded"
+              >
                 <FontAwesomeIcon icon={faPrint} />
               </button>
-              <a title="Lähetä sähköpostiin"
+              <a
+                title="Lähetä sähköpostiin"
                 href={`mailto:?subject=${recipe.title}&body=Check out this recipe: ${currentUrl}`}
                 className="bg-red-500 text-white py-2 px-4 rounded"
               >
@@ -321,7 +324,6 @@ export default function RecipePage(props) {
               Add Comment
             </button>
           </div>
-          
         </div>
       </div>
     </Layout>

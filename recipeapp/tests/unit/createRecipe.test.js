@@ -105,7 +105,6 @@ describe('createIngredients', () => {
       unit: 'unit',
     });
   });
-
 });
 
 describe('createInstructions', () => {
@@ -162,7 +161,6 @@ describe('createInstructions', () => {
     });
     expect(result).toEqual(createdInstructions);
   });
-
 });
 
 describe('createRecipe', () => {
@@ -212,7 +210,9 @@ describe('createRecipe', () => {
     const images = [{ upload: { id: '123' } }];
 
     // Invoke the function under test and expect it to throw an error
-    await expect(createRecipe(title, description, ingredients, instructions, author, regonly, images)).rejects.toThrow('Missing key fields');
+    await expect(createRecipe(title, description, ingredients, instructions, author, regonly, images)).rejects.toThrow(
+      'Missing key fields',
+    );
   });
 
   it('should create a new recipe with multiple ingredients and instructions', async () => {
@@ -246,5 +246,4 @@ describe('createRecipe', () => {
     expect(buildClientMock).toHaveBeenCalledTimes(1);
     expect(buildClientMock).toHaveBeenCalledWith({ apiToken: process.env.DATOCMS_REST_API_TOKEN });
   });
-
 });
