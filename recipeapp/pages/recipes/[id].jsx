@@ -221,7 +221,7 @@ export default function RecipePage(props) {
                   className="bg-blue-500 text-white py-2 px-4 rounded"
                   disabled={session?.userId !== recipe.author.id && session?.userId !== 'Wzxstkc8R6iQyPLfZc517Q'}
                 >
-                  <FontAwesomeIcon icon={faEdit} /> Edit Recipe
+                  <FontAwesomeIcon icon={faEdit} /> Muokkaa reseptiä
                 </button>
               </Link>
               <button
@@ -274,7 +274,7 @@ export default function RecipePage(props) {
                   +
                 </button>
               </div>
-              <h3 className="text-red-600 text-2xl font-bold p-4">Ingredients</h3>
+              <h3 className="text-red-600 text-2xl font-bold p-4">Ainesosat</h3>
               <ul className="list-disc pl-8">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className={`text-black p-2 ${ingredient.name.startsWith('--') ? 'list-none' : ''}`}>
@@ -301,12 +301,29 @@ export default function RecipePage(props) {
           {/* Comments Section */}
           {/* Display comments */}
           <div className="mt-8 p-4 bg-white rounded-md shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Comments</h2>
-            <ul>
+            <h2 className="text-xl font-semibold mb-4">Kommentit</h2>
+            <ul className="space-y-4">
               {comments.map((comment, index) => (
-                <li key={index} className="mb-4">
-                  <p className="text-gray-800">{comment.comment}</p>
-                  <p className="text-gray-500 text-sm">{comment.timestamp}</p>
+                <li key={index} className="p-4 bg-white rounded shadow">
+                  <div className="flex items-start space-x-2">
+                    <div className="space-y-1">
+                      <div className="text-gray-900 font-semibold">
+                        {comment.comment.split(':')[0]} {/* This will display the username */}
+                      </div>
+                      <p className="text-gray-700">
+                        {comment.comment.split(':')[1]} {/* This will display the comment text */}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    {new Date(comment.timestamp).toLocaleString('fi-FI', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
                 </li>
               ))}
             </ul>
