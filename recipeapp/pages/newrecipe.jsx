@@ -97,9 +97,9 @@ export default function NewRecipePage() {
       });
 
       if (createRecipeResponse.ok) {
-        const responseData = await createRecipeResponse.json();
-        // Redirect to the newly created recipe page
-        router.push(`/`);
+        setTimeout(() => {
+          router.push(`/recipes`);
+        }, 2000);
       } else {
         const errorData = await createRecipeResponse.json();
         setError('Error creating recipe:', errorData.error);
